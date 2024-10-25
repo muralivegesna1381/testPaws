@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "514809912626",
+    "project_id": "paws-digital",
+    "storage_bucket": "paws-digital.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514809912626:android:d8404370fea08821934b2b",
+        "android_client_info": {
+          "package_name": "com.pawsdigital"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD76YhMqGqWrxr4c6GNfc46LELb5bRELTA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,40 @@
+{
+  "common": {
+    "part1": "To get started, edit <1>src/App.js</1> and save to reload.",
+    "part2": "Switch language between english and german using buttons above."
+  },
+  "loginscreen": {
+    "login": "Login",
+    "submit": "Submit",
+    "forgotpassword": "Reset Password",
+    "netword_error": "Please check your network connection.",
+    "remeber_me": "Remember Me"
+  },
+  "more": {
+    "room_title": "Room/User Monitor",
+    "room": "Room",
+    "user": "User",
+    "logout": "Logout",
+    "room_pref": "Room Preferences",
+    "change_pass": "Change Password",
+    "current_mapp": "Current Mapping:",
+    "select_all": "Select All",
+    "Species": "Default Species",
+    "no_user": "Sorry, no matching results found!"
+  },
+  "notifications": {
+    "delete_notification": "Delete this notification will also remove it from the PAWS web app. Proceed?",
+    "delete_all": "Deleting all notifications will also remove them from the PAWS web app. Proceed?"
+  },
+  "homescreen": {
+    "update": "Update",
+    "delete": "Delete"
+  },
+  "forgotpassword": {
+    "title": "Reset Password",
+    "reset": "Reset password"
+  },
+  "title": "Welcome to React",
+  "applyFilter": "Apply Filters",
+  "network_error": "The server was unable to process the request. Please try again after some time."
+}

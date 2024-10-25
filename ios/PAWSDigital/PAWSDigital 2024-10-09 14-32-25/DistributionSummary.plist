@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PAWSDigital.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>0.29</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>63AA1684F75DD4821EF0DA76ED62F09274EF8B71</string>
+				<key>dateExpires</key>
+				<string>07/10/25</string>
+				<key>type</key>
+				<string>Apple Development</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>0.12.0</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>63AA1684F75DD4821EF0DA76ED62F09274EF8B71</string>
+						<key>dateExpires</key>
+						<string>07/10/25</string>
+						<key>type</key>
+						<string>Apple Development</string>
+					</dict>
+					<key>name</key>
+					<string>hermes.framework</string>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>GUTBJ785HC</string>
+						<key>name</key>
+						<string>Cambridge Technology Inc</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>0.12.0</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>GUTBJ785HC.com.cte.pawsdev</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>GUTBJ785HC</string>
+				<key>get-task-allow</key>
+				<true/>
+			</dict>
+			<key>name</key>
+			<string>PAWSDigital.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>d003d3c7-45cc-458a-acb0-c0404585b7bf</string>
+				<key>dateExpires</key>
+				<string>08/10/25</string>
+				<key>name</key>
+				<string>iOS Team Provisioning Profile: com.cte.pawsdev</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>GUTBJ785HC</string>
+				<key>name</key>
+				<string>Cambridge Technology Inc</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>0.1</string>
+		</dict>
+	</array>
+</dict>
+</plist>
