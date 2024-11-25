@@ -1,4 +1,5 @@
 export interface ProgressBardResult {
+  errors: any;
   status: Status;
   response: ProgrssBarResponse;
 }

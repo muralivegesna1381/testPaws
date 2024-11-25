@@ -50,14 +50,10 @@ const CommonHeaderComponent = ({
     async function scduleSyncData() {
         let userID = await Utils.getData("UserId");
         NetInfo.fetch().then(async (internet) => {
-           // console.log("Is connected isInternetReachable?", internet.isInternetReachable);
-
             let count = await Utils.getAllOfflienACTRecords(userID ?? "0");
             if (count?.length > 0 && internet?.isInternetReachable) {
                 Utils.synchACTData(userID ?? "0");
-            } else {
-                // console.log("==SYNCH==", count?.length);
-            }
+            } 
         });
     }
     const backBtnAction = () => {

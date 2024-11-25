@@ -50,9 +50,7 @@ const MyProfileScreen = (props: moreTabsScreenProps) => {
   const dispatch = useDispatch();
 
   const onPressLogOut = async () => {
-
     //TODO need to logout
-    console.log("onPressLogOut ---- ");
     try {
       firebaseHelper.logEvent(firebaseHelper.Event_Logout, firebaseHelper.Screen_My_Profile, "");
       let result = await NetworkManager.doLogout();

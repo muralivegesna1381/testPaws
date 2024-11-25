@@ -28,7 +28,6 @@ const LoadBowlHomeScreen = (props: loadbowlScreenProps) => {
 
 
     const onPressScanBowl = () => {
-        console.log("onPressScanBowl");
         firebaseHelper.logEvent(firebaseHelper.Event_Scanbowl_Button_Home, firebaseHelper.Screen_Loadbowl_Home, "");
         navigation.navigate('LoadBowlDetailsScreen', {
             selectionType: "scanbowl"
@@ -36,7 +35,6 @@ const LoadBowlHomeScreen = (props: loadbowlScreenProps) => {
     };
 
     const onPressLoadBowl = () => {
-        console.log("onPressLoadBowl-------");
         firebaseHelper.logEvent(firebaseHelper.Event_Loadbowl_Button_Home, firebaseHelper.Screen_Loadbowl_Home, "");
         // if (Platform.OS === "ios") {
         //     enableScreens(false);
@@ -46,8 +44,8 @@ const LoadBowlHomeScreen = (props: loadbowlScreenProps) => {
         });
     };
 
+    //TODO check methods usage and remove code if not needed
     const backBtnAction = () => {
-        console.log('Header Back Button Pressed');
     }
 
     return (

@@ -17,6 +17,7 @@ const Colors = {
   TEXT_VALID: "#117A1B",
   DISABLE_COLOR: "#A8A8A8",
   CHIP_COLOR: "#136DA533",
-  BLACK:"#000"
+  BLACK:"#000",
+  WHITE:"#FFFFFF"
 };
 export default Colors;

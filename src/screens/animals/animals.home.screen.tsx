@@ -41,9 +41,10 @@ import CheckBoxEmpty from "./../../../assets/svgs/checkbox_empty.svg";
 import CheckboxSelected from "./../../../assets/svgs/checkbox_selected.svg";
 import BottomButtonComponent from "../../components/button.component";
 import * as firebaseHelper from "../../utilities/firebase/firebaseHelper";
-import { BASE_URL } from "../../network/api.constants";
 import { useDebounce } from "../../utilities/useDebounce";
 import { MultiSelect } from 'react-native-element-dropdown';
+import DashboardStyles from "../../styles/dashboard.style";
+import { BASE_URL } from "../../../App";
 
 
 
@@ -107,7 +108,7 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
   const snapPoints = useMemo(() => ["18%"], []);
   const [selectedAnimalLocations, setSelectedAnimalLocations] = useState([]);
   const [animalLocations, setAnimalLocations] = useState([]);
-
+  const flatListRef = useRef<FlatList>(null);
   const handleSheetChanges = useCallback((index: number) => {
     if (index < 0) setOpen(false);
   }, []);
@@ -127,6 +128,7 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
 
   useFocusEffect(
     React.useCallback(() => {
+     // console.log("TEST useFocusEffect:", selectedSegment)
       if (selectedSegment == AnimalSegments.Name) {
         getAnimals("");
       } else {
@@ -134,6 +136,7 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
       }
       setIsRecordGroupActSelected(false);
       set_SelectedAnimalsForRGA([]);
+      setSelectedAnimalLocations([])
     }, [navigation])
   );
 
@@ -152,20 +155,16 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
       set_isLoading(false);
       if (animalsRes?.status?.success && animalsRes?.response?.animalList) {
         //console.error("animalsRes.response", animalsRes?.response?.animalList);
-        let dataList: AnimalObject = animalsRes?.response?.animalList;
+        let dataList: AnimalObject[] = animalsRes?.response?.animalList;
         // let res = dataList.sort((a, b) =>
         //   a.AnimalName < b.AnimalName ? -1 : 1
         // );
         getLocations("");
-        console.log("hari")
-        console.log(dataList)
+
 
         // var locations = [];
         // for (let index = 0; index < dataList.length; index++) {
-        //   console.log(dataList[index].LocationName)
         //   locations.push(dataList[index].LocationName)
-        //   console.log(locations)
-
         // }
         // const uniqueData = [...new Set(locations)];
         // setAnimalLocations(uniqueData)
@@ -181,7 +180,6 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: async () => {
-                // console.log("OK Pressed");
                 await Utils.clearUserData();
                 dispatch(updateStack({ stackName: "Auth" }));
               },
@@ -212,7 +210,7 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
         userID,
         searchText,
         "ASC",
-        "act"
+        "ANML"
       );
       set_isLoading(false);
       if (locationRes.status.success && locationRes.response.locationlist) {
@@ -230,7 +228,6 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -259,10 +256,8 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
   * Add to Search History.
   */
   const addToList = async () => {
-
     if (searchText) {
       setInSearchProgress(true);
-
       if (selectedSegment === AnimalSegments.Name) {
         firebaseHelper.logEvent(firebaseHelper.Event_Search_Animal, firebaseHelper.Screen_Animals, "");
         let userID = await Utils.getData("UserId");
@@ -301,7 +296,6 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
                 {
                   text: "Login again",
                   onPress: () => {
-                    // console.log("OK Pressed");
                     dispatch(updateStack({ stackName: "Auth" }));
                   },
                 },
@@ -331,7 +325,7 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
             userID,
             searchText,
             "ASC",
-            "act"
+            "ANML"
           );
           if (locationRes.status.success && locationRes.response.locationlist) {
             let dataList = locationRes.response.locationlist;
@@ -360,7 +354,6 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
                 {
                   text: "Login again",
                   onPress: () => {
-                    // console.log("OK Pressed");
                     dispatch(updateStack({ stackName: "Auth" }));
                   },
                 },
@@ -649,6 +642,12 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
         <Pressable
           onPress={() => {
             if (selectedSegment == AnimalSegments.Name) {
+              if (selectedAnimalLocations.length > 0) {
+                setSelectedAnimalLocations([])
+              }
+              if (isRecordGroupActSelected) {
+                set_SelectedAnimalsForRGA([])
+              }
               const updatedItems = selectedAnimalsList.filter(item => item.AnimalId === data.AnimalId);
               if (updatedItems.length == 0) {
                 set_SelectedAnimalsList([...selectedAnimalsList, data]);
@@ -680,7 +679,6 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
       <View style={[styles.searchSuggestion]}>
         <Pressable
           onPress={() => {
-            console.log("onPress");
             setSearchText("");
             setIsSuggestionVisible(false);
           }}
@@ -718,19 +716,16 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
       </View>
     );
   };
-  function AnimalsDefaultList() {
-    let list = selectedAnimalLocations.length == 0 ? animals : animals?.filter((item) => selectedAnimalLocations.includes(item.LocationName));
-    return (<FlatList
-      data={list}
-      renderItem={({ item, index }) => animalRowItem(item)}
-      keyExtractor={(item) => item.AnimalId.toString()}
-    />);
-  }
+  // function AnimalsDefaultList() {
+  //   let list = selectedAnimalLocations.length == 0 ? animals : animals?.filter((item) => selectedAnimalLocations.includes(item.LocationName));
+  //   return (<FlatList
+  //     data={list}
+  //     renderItem={({ item, index }) => animalRowItem(item)}
+  //     keyExtractor={(item) => item.AnimalId.toString()}
+  //   />);
+  // }
 
   const renderLocationDropDownItem = (item) => {
-    console.log("selectedAnimalLocations")
-
-    console.log(selectedAnimalLocations)
     const updatedItems = selectedAnimalLocations.filter(item1 => item1 === item.locationDesc);
     return (
       <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center' }}>
@@ -756,6 +751,8 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
       </View>
     );
   };
+  let list = selectedAnimalLocations.length == 0 ? animals : animals?.filter((item) => selectedAnimalLocations.includes(item.LocationName));
+
   return (
 
     <View style={[styles.mainContainer, { paddingTop: insets.top }]}>
@@ -768,7 +765,7 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
 
 
           (
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ flex: 1 }}>
                 <SearchUI
                   placeHolder={
@@ -787,35 +784,41 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
               }}>
                 <MultiSelect
                   style={{
-                    height: 40,
+                    height: 35,
                     backgroundColor: 'transparent',
                     borderRadius: 6,
                     borderColor: "#242E4226",
                     borderWidth: 1,
-                    padding: 8
+                    padding: 8,
                     // borderBottomColor: 'gray',
                     // borderBottomWidth: 0.5,
                   }}
                   visibleSelectedItem={false}
-                  placeholderStyle={{ fontSize: 16, }}
+                  placeholderStyle={[CommonStyles.textStyleRegular, { color: "#41403f", fontSize: 14 }]}
                   // selectedTextStyle={{ fontSize: 14, }}
                   // inputSearchStyle={styles.inputSearchStyle}
                   // iconStyle={styles.iconStyle}
                   activeColor='white'
                   data={locations}
-                  search={false}
+                  search={true}
                   labelField="locationDesc"
                   valueField="locationDesc"
-                  placeholder="Location"
+                  placeholder={"Location" + ` ${selectedAnimalLocations.length > 0 ? "+" + selectedAnimalLocations.length : ""}`}
+                  selectedTextStyle={{ color: 'red' }}
                   searchPlaceholder="Search..."
                   value={selectedAnimalLocations}
                   onChange={item => {
+                    if (selectedAnimalsList.length > 0) {
+                      set_SelectedAnimalsList([]);
+                    }
+                    if (isRecordGroupActSelected) {
+                      set_SelectedAnimalsForRGA([])
+                    }
                     setSelectedAnimalLocations(item);
+                    // use current
+                    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
                   }}
                   renderItem={renderLocationDropDownItem}
-
-
-                  selectedStyle={{ backgroundColor: "blue" }}
                 />
               </View>
             </View>
@@ -840,6 +843,21 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
             renderItem={({ item, index }) => (
               <View style={{ alignItems: "center", margin: 2 }}>
                 <CustomChip style={{ width: width / 2.3 }} textLableStyle={{ color: 'black', }} textLable={item.AnimalNameTattoo} onClose={function (): void {
+                  ///Removing ACT record data if animal removed from selection.
+                  try {
+                    let animalIndecx = index;
+                    if (isRecordGroupActSelected) {
+
+                      let temp = [...selectedAnimalsList]
+                      var animalid = temp[animalIndecx].AnimalId;
+                      let animalIde = selectedAnimalsForRGA.findIndex(item => item.AnimalId === animalid);
+                      if (animalIde > 0) {
+                        selectedAnimalsForRGA.splice(animalIde, 1)
+                      }
+                    }
+                  } catch (e) {
+                    console.error(e);
+                  }
 
                   const updatedItems = selectedAnimalsList.filter(item => item.AnimalId !== selectedAnimalsList[index].AnimalId);
                   set_SelectedAnimalsList(updatedItems);
@@ -876,7 +894,19 @@ const AnimalHomeScreen = (props: AnimalScreenProps) => {
               keyExtractor={(item) => item.AnimalId.toString()}
             /> :
 
-            <AnimalsDefaultList></AnimalsDefaultList>
+            <FlatList
+              data={list}
+              ref={flatListRef}
+              ListHeaderComponent={() => <>
+                {
+                  (list?.length === 0 && animals.length > 0) ? <Text style={DashboardStyles.textLargeCenter}>
+                    No matching records found
+                  </Text> : null
+                }
+              </>}
+              renderItem={({ item, index }) => animalRowItem(item)}
+              keyExtractor={(item) => item.AnimalId.toString()}
+            />
 
         ) :
           selectedLocationsList.length > 0 ?
@@ -1103,6 +1133,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderColor: "#242E4226",
     borderWidth: 1,
+    height: 35
   },
   SearchUI: {
     backgroundColor: "#FFFFFF",

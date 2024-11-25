@@ -49,7 +49,6 @@ import {
   getNotificationItems,
   getNotificationReadStatus,
   saveNotifiyItem,
-  saveNotifiyItems,
   saveNotifiyItemsList,
 } from "./notification-db";
 import { SQLiteDatabase } from "react-native-sqlite-storage";
@@ -94,7 +93,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
     bottomSheetModalRef.current?.present();
   }, []);
   const handleSheetChanges = useCallback((index: number) => {
-   // console.log("handleSheetChanges", index);
     if (index < 0) setOpen(false);
   }, []);
   const [open, setOpen] = useState(false);
@@ -107,7 +105,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
       await createTable(db);
       userId = (await Utils.getData("UserId")) ?? "";
       let response = await NetworkManager.getUserNotifications(userId, 0, 100);
-     // console.log("TEST", response?.status?.httpStatus == 401);
       if (response?.status?.httpStatus == 200) {
         setTotalRecods(response?.response?.totalRecords ?? 0);
         let dataList: NotificationObject[] = response.response.rows;
@@ -115,8 +112,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
 
         dataList.forEach((element, index) => {
           var dateString = element.notificationDate; // Oct 23
-          // //console.log("dateString", dateString);
-
           dataList[index].notificationDate = Utils.getConvertedDate(
             dateString,
             "MMM-DD-YYYY",
@@ -129,7 +124,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
           //const sored = await saveNotifiyItems(db, dataList);
 
           const getlist = await getNotificationItems(db, userId);
-          //console.log("result getlist::", getlist?.length);
           if (getlist) setReadList(getlist);
         } catch (e) {
           console.error(e);
@@ -137,8 +131,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
 
         setDataListNew(dataList);
       } else if (response?.status?.httpStatus == 401) {
-        //console.log("Login again.......");
-
         Alert.alert(
           "Fail",
           response?.errors[0]?.message ?? "",
@@ -146,7 +138,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
             {
               text: "Login again",
               onPress: () => {
-                //console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -162,7 +153,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
     }
   }
   useEffect(() => {
-   // console.log("useeffect call");
     firebaseHelper.reportScreen(firebaseHelper.Screen_Notifications);
     loadAsyncData();
   }, []);
@@ -171,7 +161,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
     let result = readList.find(
       (item) => item.notificationId === notificationId
     );
-    //console.log("result", result);
     return result ? true : false;
   };
   const Item = (item: NotificationObject) => (
@@ -227,7 +216,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
             <Animated.View style={[styles.deleteButton, { opacity }]}>
               <TouchableOpacity
                 onPress={async () => {
-                 // console.log("Notification", notificationID, "User", userId);
                   //let userId = await Utils.getData("UserId") ?? "";
                   Alert.alert(
                     "",
@@ -235,7 +223,9 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
                     [
                       {
                         text: "No",
-                        onPress: () => console.log("No Pressed"),
+                        onPress: () => {
+                          //do nothing
+                        },
                         style: "cancel",
                       },
                       {
@@ -251,13 +241,11 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
                                 userId,
                                 notificationID
                               );
-                             // console.log("Data ", response?.status?.success);
                               if (response?.status?.success) {
                                 //Alert.alert(response?.response?.message);
                                 //Delte from local db also
                                 try {
                                   let result = await deleteNotifyItem(db, notificationID);
-                                 // console.log("Delete result", result);
                                 } catch (e) {
                                   console.error(e);
                                 }
@@ -295,7 +283,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
         );
       };
   const readAllFunction = async () => {
-   // console.log("COndition", dataListNew);
     firebaseHelper.logEvent(firebaseHelper.Event_Notifications_Read_All, firebaseHelper.Screen_Notifications, "");
     //let userId = await Utils.getData("UserId") ?? "";
     let result = await saveNotifiyItemsList(db, dataListNew ?? [], userId);
@@ -306,7 +293,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
       loadAsyncData();
     } else {
       showToast("Unable to mark all as read!", "success");
-      //console.log("Unable to mark as read!");
     }
   };
 
@@ -315,24 +301,18 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
       setLoading(true);
       let allNotificaionIds = "";
       dataListNew?.forEach((element) => {
-        //console.log("TEST", element.notificationId);
         allNotificaionIds = allNotificaionIds + element.notificationId + ",";
       });
-
-      //console.log("COndition", allNotificaionIds);
       //let userId = await Utils.getData("UserId") ?? "";
-
       if (allNotificaionIds) {
         let response = await NetworkManager.deleteNotification(
           userId,
           allNotificaionIds
         );
-        //console.log("Data ", response?.status?.success);
         if (response?.status?.success) {
           //Alert.alert(response?.response?.message);
           try {
             let result = await deleteAllNotificaion(db, userId);
-           // console.log("deleteAllNotificaion", result);
           } catch (e) {
             console.error(e);
           }
@@ -340,11 +320,9 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
           //   "All Notification are deleted and cannot be retrieved."
           // );
           showToast("All Notification are deleted and cannot be retrieved.", "success");
-
           loadAsyncData();
         } else {
           Alert.alert("Error:", response.errors[0]?.message ?? "");
-         // console.log("Delete All Notifications", response.errors[0]?.message);
         }
       } else {
         showToast("No notifications to delete.", "success");
@@ -362,7 +340,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
         progress: Animated.AnimatedInterpolation<any>,
         dragX: Animated.AnimatedInterpolation<any>
       ) => {
-        // console.log("Notification ", notificationID);
         const opacity = dragX.interpolate({
           inputRange: [-50, 0],
           outputRange: [0, 1],
@@ -375,32 +352,31 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
             <Animated.View style={[styles.readButton, { opacity }]}>
               <TouchableOpacity
                 onPress={async () => {
-                  //console.log("Notification read", notificationID);
                   //Need to store local db for read status.
-                  let index =
-                    dataListNew?.findIndex(
-                      (item) => item.notificationId === notificationID
-                    ) ?? -1;
-                 // console.log("Save index ", index);
-                  if (index >= 0) {
-
-                    let readNotifcaion = dataListNew[index];
-                    if (readNotifcaion) {
-                      firebaseHelper.logEvent(firebaseHelper.Event_Notification_Read, firebaseHelper.Screen_Notifications, "");
-                      let result = await saveNotifiyItem(
-                        db,
-                        readNotifcaion,
-                        userId
-                      );
-
-                      //Notification marked as read.
-                      //Utils.showToastMessage("Notification marked as read.");
-                      showToast("Notification is marked as read successfully!", "success");
-                      setDataListNew(dataListNew);
-                      //Need to check otheway to close
-                      loadAsyncData();
-                      //opacity.removeAllListeners()
+                  if (dataListNew !== undefined) {
+                    let index =
+                      dataListNew?.findIndex(
+                        (item) => item.notificationId === notificationID
+                      ) ?? -1;
+                    if (index >= 0) {
+                      let readNotifcaion = dataListNew[index] ?? 0;
+                      if (readNotifcaion) {
+                        firebaseHelper.logEvent(firebaseHelper.Event_Notification_Read, firebaseHelper.Screen_Notifications, "");
+                        let result = await saveNotifiyItem(
+                          db,
+                          readNotifcaion,
+                          userId
+                        );
+                        //Notification marked as read.
+                        //Utils.showToastMessage("Notification marked as read.");
+                        showToast("Notification is marked as read successfully!", "success");
+                        setDataListNew(dataListNew);
+                        //Need to check otheway to close
+                        loadAsyncData();
+                        //opacity.removeAllListeners()
+                      }
                     }
+
                   }
                 }}
               >
@@ -423,7 +399,6 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
       setOpen(false);
       bottomSheetModalRef.current?.close();
     }
-   // console.log("Menut handlePresentModalPress", bottomSheetModalRef);
   };
   return (
     <GestureHandlerRootView>
@@ -480,7 +455,9 @@ const NotificationHome: React.FC<NotificationProps> = (props) => {
                     [
                       {
                         text: "No",
-                        onPress: () => console.log("No Pressed"),
+                        onPress: () => {
+                          //do nothing
+                        },
                         style: "cancel",
                       },
                       {

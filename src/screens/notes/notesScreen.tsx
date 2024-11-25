@@ -121,8 +121,6 @@ const NotesScreen = (props: NoteScreenProps) => {
 
   const startListening = async () => {
     //setRecognizedText("");
-    // console.log("startListening");
-
     //setIsListening(true);
     isListening.current = true
     try {
@@ -131,32 +129,22 @@ const NotesScreen = (props: NoteScreenProps) => {
       console.error(e);
     }
   };
-
   const stopListening = async () => {
-    //console.log("stopListening");
-
     // setIsListening(false);
     isListening.current = false
     afterVoiceStopResultCallCount.current = 0
     try {
       await Voice.stop();
     } catch (e) {
-      console.log("stopListening error");
-
       console.error(e);
     }
   };
-
   const onSpeechStart = () => {
-    console.log("onSpeechStart");
-
+    //speech started
   };
 
   const onSpeechEnd = () => {
-    //console.log("onSpeechEnd");
-
     // setIsListening(false);
-
     isListening.current = false
     inputTextBeforeVoice.current = ''
 
@@ -173,8 +161,9 @@ const NotesScreen = (props: NoteScreenProps) => {
       return
     }
 
-    let previousText = `${inputTextBeforeVoice.current} ${e.value[0]}`;
+
     if (e.value && e.value.length > 0) {
+      let previousText = `${inputTextBeforeVoice.current} ${e.value[0]}`;
       setRecognizedText(previousText);
     }
   };
@@ -245,7 +234,7 @@ const NotesScreen = (props: NoteScreenProps) => {
       return item.id === editingId
     })
 
-    editingItem[0].value = recognizedText
+    editingItem[0].value = recognizedText.replaceAll("'", "’")
     try {
       const db = await getDBConnection();
       const res = await editTodoItems(db, editingItem);

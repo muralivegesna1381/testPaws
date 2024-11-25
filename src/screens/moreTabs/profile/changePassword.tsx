@@ -69,15 +69,10 @@ const ChangePasswordScreen = (props: ChangePasswordParamListProps) => {
 
             setLoading(true)
             let result = await NetworkManager.requestPasswordChange(requestBody);
-            console.log("doPasswordChange", result);
             if (result?.status?.httpStatus == 200) {
                 //TODO need to change token, user id, mail
                 let userResponse: UserResponse = result?.response;
                 await Utils.storeData("Token", userResponse?.accessToken ?? "");
-                console.log(
-                    "MAIN MAIN---->",
-                    userResponse?.userDetails?.userInfoId
-                );
                 Utils.storeData(
                     "UserId",
                     String(userResponse?.userDetails?.userInfoId ?? "")
@@ -95,7 +90,6 @@ const ChangePasswordScreen = (props: ChangePasswordParamListProps) => {
                 }
 
             } else if (result?.status?.httpStatus == 400) {
-                console.log("doPasswordChange 400", result);
                 // Utils.showToastMessage(result?.errors[0].message ?? "Please try again");
                 Alert.alert(result?.errors[0].message?.length > 0 ? result?.errors[0].message : "The server was unable to process the request. Please try again after some time.")
             }
@@ -235,7 +229,6 @@ const ChangePasswordScreen = (props: ChangePasswordParamListProps) => {
                             onChangeText={(userPswd) => {
                                 setConfirmPassword(userPswd);
                                 let reulst = Utils.validatePassword(userPswd);
-                                console.log("result", reulst)
                             }}
                         />
 
@@ -337,8 +330,6 @@ const ChangePasswordScreen = (props: ChangePasswordParamListProps) => {
                             gradientColors={!isValidLoginInputs() ? ["rgba(0, 0, 0, 0.4)", 'rgba(0, 0, 0, 0.4)'] : ["rgba(255, 111, 12, 0.2)", "rgba(255, 111, 12, 0.2)"]}
                         />
                         {/* <BottomButtonComponent style={{ width: 100 }} title={"Submit"} buttonClick={function (): void {
-
-                            console.log("Is from ", props.route.params?.isFromLogin)
                             let flow = props.route.params?.isFromLogin ? Flow.RESET : Flow.CHANGE;
                             let bothAreEqual = new_Password === confirm_Password;
                             let errorlist = Utils.validatePassword(new_Password);
@@ -352,21 +343,16 @@ const ChangePasswordScreen = (props: ChangePasswordParamListProps) => {
                                         {
                                             text: "No",
                                             onPress: () => {
-                                                console.log("OK Pressed");
-
                                             },
                                         },
                                         {
                                             text: "Yes",
                                             onPress: () => {
-                                                console.log("OK Pressed");
-
                                                 let requestBody = {
                                                     "oldPassword": old_Password,
                                                     "newPassword": new_Password,
                                                     "flow": flow
                                                 }
-                                                console.log("requestBody", requestBody);
                                                 doPasswordChange(requestBody);
                                             },
                                         },
@@ -391,8 +377,6 @@ const ChangePasswordScreen = (props: ChangePasswordParamListProps) => {
                                 else if (!bothAreEqual) {
                                     Utils.showToastMessage("The password and confirm password fields value must be matched")
                                 }
-
-                                console.log("Please provide passowrd")
                             }
 
                         }} buttonType={"submit"} ></BottomButtonComponent> */}

@@ -49,9 +49,10 @@ import MeasurementPageStyles from "../../styles/measurments.page.style";
 import { RootState } from "../../redux/store";
 import Search from "./../../../assets/svgs/search.svg";
 import * as firebaseHelper from "../../utilities/firebase/firebaseHelper";
-import { BASE_URL } from "../../network/api.constants";
+
 import moment from "moment";
 import DashboardStyles from "../../styles/dashboard.style";
+import { BASE_URL } from "../../../App";
 
 
 type AnimalScreenProps = NativeStackScreenProps<
@@ -89,7 +90,6 @@ const AnimalTasksOperationsScreen = (props: AnimalScreenProps) => {
     else {
       setOpen(true);
     }
-   // console.log("TRIGGERING", index)
   }, []);
 
   const backBtnAction = () => {
@@ -114,7 +114,6 @@ const AnimalTasksOperationsScreen = (props: AnimalScreenProps) => {
   }
   const changeCheckList = (isOpen: boolean) => {
     var suggestionList = [...animalData];
-   // console.log(searchAnimalsText);
     if (searchAnimalsText.length > 0) {
       if (type === 1) {
         suggestionList = animalData.filter((result) => result?.actName.toLowerCase().includes(searchAnimalsText.toLowerCase()));
@@ -122,8 +121,6 @@ const AnimalTasksOperationsScreen = (props: AnimalScreenProps) => {
         suggestionList = animalData.filter((result) => result?.animalNameTattoo.toLowerCase().includes(searchAnimalsText.toLowerCase()));
       }
     }
-   // console.log("suggestionList===>", suggestionList);
-    //console.log("TEAT changeCheckList", isOpen);
     if (isOpen) {
       suggestionList.map(item => {
         item.isSelected = true
@@ -138,32 +135,21 @@ const AnimalTasksOperationsScreen = (props: AnimalScreenProps) => {
     }
   }
   const handleCheckboxChange = (id: AnimalResponse) => {
-    // console.log("YOu selected :", id.animalNameTattoo);
     if (id.isSelected) {
       const newArray = [...selectedAnimals];
       newArray.push(id);
-      // console.log("After update +index ", newArray.length);
       setSelectedAnimals(newArray);
     } else {
       const newArray = [...selectedAnimals];
 
       let index = newArray.findIndex((ob) => ob.actScheduleId === id.actScheduleId);
       if (index >= 0) newArray.splice(index, 1);
-      // console.log("After update ---index", newArray.length);
       setSelectedAnimals(newArray);
     }
   };
 
   useEffect(() => {
     firebaseHelper.reportScreen(firebaseHelper.Screen_Tasks);
-
-    // console.log(
-    //   "USE EFF OPERATIONS",
-    //   actId,
-    //   type,
-    //   selectedTypeId,
-    //   locationValue
-    // );
     // getScheduledAnimals();
   }, []);
 
@@ -213,7 +199,6 @@ const AnimalTasksOperationsScreen = (props: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -293,7 +278,6 @@ const AnimalTasksOperationsScreen = (props: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -387,7 +371,6 @@ const AnimalTasksOperationsScreen = (props: AnimalScreenProps) => {
         renderItem={({ item, index }) => animalRowItem(item)}
         keyExtractor={(item) => `${item.animalId}-${item.actScheduleId}-${item.animalNameTattoo}`}
       // ListHeaderComponent={() => {
-      //   console.log("HRERE")
       //   return searchAnimalData.length === 0 ? (
       //     <Text style={DashboardStyles.textLargeCenter}>
       //       No matching records found
@@ -712,7 +695,6 @@ const AnimalTasksOperationsScreen = (props: AnimalScreenProps) => {
                 //   selectedAnimals: selectedAnimals,
                 //   type: type,
                 //   onRquiredRefrs(val) {
-                //     console.log("onRquiredRefrs", val);
                 //     if (val) {
                 //       getScheduledAnimals(false)
                 //     }
@@ -786,7 +768,6 @@ const SearchUI: React.FC<SerachUIProps> = (props) => {
 
       <TouchableOpacity
         onPress={() => {
-          //console.log("TEST", props.searchText);
           props.addToList();
         }}
       >

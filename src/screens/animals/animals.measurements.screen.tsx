@@ -56,7 +56,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import * as firebaseHelper from "../../utilities/firebase/firebaseHelper";
 
 import { fetch } from "@react-native-community/netinfo";
-import { BASE_URL } from "../../network/api.constants";
+import { BASE_URL } from "../../../App";
+
 type AnimalScreenProps = NativeStackScreenProps<AnimalStackParamList, "Tasks">;
 var currentDate = moment(new Date()).format("MM/DD/YYYY");
 const AnimalTasksScreen = (props: AnimalScreenProps) => {
@@ -74,6 +75,8 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
   const [actResponse, set_actResponse] = useState<Act[]>([]);
   const [expandedItemIndex, setExpandedItemIndex] = useState(-1)
   let commentTextBeforeVoice = useRef<string>('')
+  let isListening = useRef<boolean>(false)
+  let afterVoiceStopResultCallCount = useRef<number>(0)
   const dispatch = useDispatch();
   const [selectedAnimals, setSelectedAnimals] = useState<AnimalResponse[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -85,7 +88,7 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
   const [bottomSheetData, setBottomSheetData] = useState<
     UserType[]
   >([]);
-  const [isListening, setIsListening] = useState<boolean>(false);
+  //const [isListening, setIsListening] = useState<boolean>(false);
   const [isMenuOptionSelected, setIsMenuOptionSelected] = useState(false);
   const [alertType, setAlertType] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -113,33 +116,41 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
     };
   }, []);
 
-  useEffect(() => {
-    Voice.onSpeechResults = (e: SpeechResultsEvent) => {
-      if (e.value && e.value[0]) {
-        if (actResponse[expandedItemIndex]?.results != undefined) {
-          if (e.value[0].length > 0) {
-            actResponse[expandedItemIndex].isReadyForSave = true;
-          }
-          else {
-            actResponse[expandedItemIndex].isReadyForSave = false;
-          }
-          updateCommentText(`${commentTextBeforeVoice.current} ${e.value[0]}`)
-        }
-      }
-    };
+  // useEffect(() => {
+  //   Voice.onSpeechResults = (e: SpeechResultsEvent) => {
+  //     if (e.value && e.value[0]) {
+  //       if (actResponse[expandedItemIndex]?.results != undefined) {
+  //         if (e.value[0].length > 0) {
+  //           actResponse[expandedItemIndex].isReadyForSave = true;
+  //         }
+  //         else {
+  //           actResponse[expandedItemIndex].isReadyForSave = false;
+  //         }
+  //         updateCommentText(`${commentTextBeforeVoice.current} ${e.value[0]}`)
+  //       }
+  //     }
+  //   };
 
-    Voice.onSpeechEnd = (e: SpeechEndEvent) => {
-      commentTextBeforeVoice.current = ''
-    }
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, [expandedItemIndex]);
+  //   Voice.onSpeechEnd = (e: SpeechEndEvent) => {
+  //     commentTextBeforeVoice.current = ''
+  //   }
+  //   return () => {
+  //     Voice.destroy().then(Voice.removeAllListeners);
+  //   };
+  // }, [expandedItemIndex]);
 
   useFocusEffect(
     React.useCallback(() => {
       Voice.onSpeechResults = (e: SpeechResultsEvent) => {
 
+        if (isListening.current === false) {
+          afterVoiceStopResultCallCount.current = afterVoiceStopResultCallCount.current + 1
+          if (afterVoiceStopResultCallCount.current > 1) {
+            afterVoiceStopResultCallCount.current = 0
+            stopListening()
+          }
+          return
+        }
 
         if (e.value && e.value[0]) {
           if (actResponse[expandedItemIndex]?.results != undefined) {
@@ -156,6 +167,8 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
 
       Voice.onSpeechEnd = (e: SpeechEndEvent) => {
         commentTextBeforeVoice.current = ''
+        isListening.current = false
+
       }
 
       return () => {
@@ -178,6 +191,7 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
     const _inputData = [...actResponse]
     const _results = [..._inputData[expandedItemIndex].results]
     _results[0].comments = text
+    _inputData[expandedItemIndex].isReadyForSave = text.length > 0;
     _inputData[expandedItemIndex] = { ..._inputData[expandedItemIndex], results: _results }
     set_actResponse(_inputData);
   }
@@ -207,10 +221,11 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
             buttonPositive: 'OK',
           },
         );
+        //TODO check the usage of this code and remove if not needed
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          // console.log('You can use the microphone');
+          console.log('You can use the microphone');
         } else {
-          // console.log('Microphone permission denied');
+          console.log('Microphone permission denied');
         }
       } catch (err) {
         console.warn(err);
@@ -220,10 +235,11 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
   const startListening = async (itemIdex: number) => {
 
     await requestMicrophonePermission();
+    isListening.current = true
     try {
       await Voice.start("en-US"); // Change to your desired language
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -232,12 +248,12 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
   }
   const stopListening = async () => {
 
-    setIsListening(false);
-    //sttString = "";
+    isListening.current = false
+    afterVoiceStopResultCallCount.current = 0
     try {
       await Voice.stop();
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -281,7 +297,7 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
     );
   };
   const getACTScheduleID = (actScheduleId: number) => {
-    //console.log("ACT SCHEDULE ID", actScheduleId);
+    //TODO check and remove this method
   };
   const handleCheckboxChange = (id: AnimalResponse) => {
     if (id.isSelected) {
@@ -465,7 +481,6 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -502,7 +517,6 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -578,7 +592,6 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
       set_isLoading(true)
       let result = await NetworkManager.saveGroupActResults(requestBody, isInternetReachable);
       if (result == "OFFLINE") {
-        // console.log("result", "OFFLINE");
       }
       if (isInternetReachable) {
         if (result?.status?.httpStatus === 200) {
@@ -656,7 +669,6 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
   }
   function animalRowItem(item: AnimalResponse, itemIdex: number) {
     let actResult = type === 3 ? actResponse?.find((act) => (act.animalId === item.animalId)) : actResponse?.find((act) => (act.actScheduleId === item.actScheduleId) && (act.animalId === item.animalId));
-    //console.log("TEST condition check =>>", item.actScheduleId, item.animalId, actResult)
     //TODO we have provision for show only one value as Result, here only getting first one.
     let resultValue = false;
     let actScaleTyle: ACT_SCALE_TYPES = ACT_SCALE_TYPES.UNDEFINED;
@@ -1020,13 +1032,11 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
             {
               text: "No",
               onPress: () => {
-                // console.log("OK Pressed");
               },
             },
             {
               text: "Yes",
               onPress: () => {
-                // console.log("OK Pressed");
                 _saveResults(actfinalList, false);
               },
             }
@@ -1181,9 +1191,7 @@ const AnimalTasksScreen = (props: AnimalScreenProps) => {
           <Pressable
             onPress={() => {
               if (selectedAnimals.length > 0) {
-                //console.log("navigation code");
                 firebaseHelper.logEvent(firebaseHelper.Event_ReSchdule_ACT_Measurements, firebaseHelper.Screen_Measurements, "");
-
                 navigation.navigate("Submission", {
                   operation: ACT_OPERATIONS.RESCHEDULE,
                   selectedAnimals: selectedAnimals,

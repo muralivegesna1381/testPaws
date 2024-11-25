@@ -25,7 +25,6 @@ createdUser TEXT,
 read_status BLOB DEFAULT (0),
 user_id TEXT,
 createdOn TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`;
- // console.log("query", query);
   let reulst = await db.executeSql(query);
 
 };
@@ -46,7 +45,6 @@ export const getNotificationItems = async (
     });
     return notifyItems;
   } catch (error) {
-    //console.log("Notificaion DB", error);
     return notifyItems;
   }
 };
@@ -65,7 +63,6 @@ export const getNotificationReadStatus = async (
         notifyItems.push(result.rows.item(index));
       }
     });
-   // console.log("NOTIFICy read", results.length);
     return notifyItems;
   } catch (error) {
     throw Error("Failed to get notifyItems !!!");
@@ -103,7 +100,6 @@ export const saveNotifiyItem = async (
         `INSERT OR IGNORE INTO  ${_tableName}(notificationId, createdUser, description, notificationDate,user_id) values` +
         `(${i?.notificationId},'${i?.createdUser}' ,'${i?.description}' ,'${i?.notificationDate}',${user_id} )`;
 
-     // console.log("insertQuery", insertQuery);
       return db.executeSql(insertQuery);
     }
   } catch (e) {
@@ -113,7 +109,6 @@ export const saveNotifiyItem = async (
 
 export const deleteNotifyItem = async (db: SQLiteDatabase, id: number) => {
   const deleteQuery = `DELETE from ${_tableName} where notificationId = ${id}`;
- // console.log("deleteQuery", deleteQuery);
   var result = await db.executeSql(deleteQuery);
   return result;
 };
@@ -123,7 +118,6 @@ export const deleteAllNotificaion = async (
 ) => {
   const deleteQuery = `DELETE from ${_tableName} where user_id = ${user_id}`;
   var result = await db.executeSql(deleteQuery);
-  //console.log("deleteAllNotificaion", deleteQuery, result);
   return result;
 };
 

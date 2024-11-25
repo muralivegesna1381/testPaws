@@ -71,7 +71,7 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
 
   const [isLoading, set_isLoading] = useState(false);
   const [recognizedText, setRecognizedText] = useState<string>("");
-  const [isListening, setIsListening] = useState<boolean>(false);
+  //const [isListening, setIsListening] = useState<boolean>(false);
   const today = moment().format("YYYY-MM-DD");
   const [modalVisible, setModalVisible] = useState(false);
   const [performedBy, setPerformedBy] = useState<UserType>();
@@ -84,6 +84,8 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
   const [actResponse, set_actResponse] = useState<Act[]>([]);
   const [selectedAnimalsList, set_SelectedAnimalsList] = useState<AnimalResponse[]>(selectedAnimals);
   let inputTextBeforeVoice = useRef<string>('')
+  let isListening = useRef<boolean>(false)
+  let afterVoiceStopResultCallCount = useRef<number>(0)
   const dispatch = useDispatch();
 
 
@@ -143,8 +145,7 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
   }, []);
 
   const startListening = async () => {
-    //setRecognizedText("");
-    // setIsListening(true);
+    isListening.current = true
     try {
       await Voice.start("en-US"); // Change to your desired language
     } catch (e) {
@@ -153,7 +154,8 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
   };
 
   const stopListening = async () => {
-    // setIsListening(false);
+    isListening.current = false
+    afterVoiceStopResultCallCount.current = 0
     try {
       await Voice.stop();
     } catch (e) {
@@ -165,11 +167,20 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
   };
 
   const onSpeechEnd = () => {
-    //setIsListening(false);
+    isListening.current = false
     inputTextBeforeVoice.current = ''
   };
 
   const onSpeechResults = (e: any) => {
+    if (isListening.current === false) {
+      afterVoiceStopResultCallCount.current = afterVoiceStopResultCallCount.current + 1
+      if (afterVoiceStopResultCallCount.current > 1) {
+        afterVoiceStopResultCallCount.current = 0
+        stopListening()
+      }
+      return
+    }
+
     if (e.value && e.value.length > 0) {
       let previousText = `${inputTextBeforeVoice.current} ${e.value[0]}`;
       if (previousText.length > 500) {
@@ -206,7 +217,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
       let getACTGroupResults = await NetworkManager.getACTResults(actReqBody);
       if (getACTGroupResults?.status?.httpStatus === 200) {
         let results: RecordGrpuActReponse = getACTGroupResults;
-        //console.log("Response", JSON.stringify(results.response.acts));
         set_actResponse(results.response.acts);
       } else if (getACTGroupResults?.status?.httpStatus == 401) {
         Alert.alert(
@@ -216,7 +226,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -246,7 +255,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
       );
       set_isLoading(false);
       if (rescheduleACT?.status?.success && rescheduleACT?.response) {
-        //console.log("Res main", rescheduleACT.response);
         Alert.alert("Alert!", rescheduleACT.response.message, [
           {
             text: "OK", onPress: () => {
@@ -274,10 +282,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
 
   async function _saveResults(actfinalList: Act[]) {
     let convertedDate = Utils.getConvertedDate(selectedDate, "YYYY-MM-DD", "DD-MMM-YYYY");
-    // console.log(
-    //   "act::::::: fd",
-    //   JSON.stringify(actfinalList)
-    // );
     let tepmActs: Act[] = [...actfinalList];
     tepmActs.forEach((item) => {
       item.isReadyForSave = true
@@ -287,11 +291,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
 
       });
     });
-
-
-    // tepmActs[0].results = [oneReulst];
-
-    //console.log("act:::::::act tepmActs", selectedDate, convertedDate);
     var userId = await Utils.getData("UserId");
     let requestBody: RecordGrpuActRequst = {
       performedBy: performedBy?.userInfoId ?? 0,
@@ -303,7 +302,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
     try {
       set_isLoading(true)
       let result = await NetworkManager.saveGroupActResults(requestBody);
-      //console.log("result", result);
       if (result?.status?.httpStatus === 200) {
         //let response: RecordGrpuActReponse = result;
         //Utils.showToastMessage("Records are saved!");
@@ -357,13 +355,11 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
         performedBy.userInfoId,
         selectedPerformedDate
       );
-      //console.log("getScheduledAnimalsList", getScheduledAnimalsList);
       set_isLoading(false);
       if (
         getScheduledAnimalsList.status.success &&
         getScheduledAnimalsList.response
       ) {
-        //console.log("Res main", getScheduledAnimalsList.response);
         Alert.alert("Alert!", getScheduledAnimalsList.response.message, [
           {
             text: "OK", onPress: () => {
@@ -382,7 +378,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -433,7 +428,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -442,11 +436,11 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
         );
       } else {
         onRquiredRefrs(false);
-
-        Alert.alert(
-          "Alert!",
-          getScheduledAnimalsList?.errors[0]?.message ?? "The server was unable to process the request. Please try again after some time."
-        );
+        showToast(getScheduledAnimalsList?.errors[0]?.message ?? "The server was unable to process the request. Please try again after some time.", "error")
+        // Alert.alert(
+        //   "Alert!",
+        //   getScheduledAnimalsList?.errors[0]?.message ?? "The server was unable to process the request. Please try again after some time."
+        // );
       }
     } catch (e) {
       console.error("Error", e);
@@ -482,7 +476,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -524,7 +517,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
       ids.push({ scheduleId: ob.actScheduleId, title: ob.scheduledDate })
 
     });
-    //console.log("DATES::::", ids);
     set_chipsData(ids);
   }
 
@@ -555,7 +547,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -679,7 +670,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
                       // let listTemp = selectedAnimals?.filter(
                       //   (data) => data.animalNameTattoo != chipsData[index]
                       // );
-                      // console.log("TEST listTemp", listTemp);
                       set_SelectedAnimalsList(finalList);
 
                       setTimeout(() => {
@@ -708,7 +698,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
               </Text>
               <Text style={CommonStyles.textStyleRegular}>
                 {/* var currentDate = moment(date).format("YYYY-MM-DD");
-                console.log("date currentDate", currentDate);
                 setSelectedDate(currentDate);
                 {selectedDate} */}
                 {moment(selectedDate).format("MM/DD/YYYY")}
@@ -778,7 +767,7 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
                       // position: "absolute",
                     }}
                     onPressIn={() => {
-                      inputTextBeforeVoice.current = recognizedText
+                      inputTextBeforeVoice.current = recognizedText.replaceAll("'", "’")
                       if (operation == ACT_OPERATIONS.MARK_AS_COMPLETE) {
                         firebaseHelper.logEvent(firebaseHelper.Event_Speech_Mark_as_Complete, firebaseHelper.Screen_Tasks, "");
                       }
@@ -856,7 +845,6 @@ const AnimalACTSubmission = ({ route, navigation }: AnimalScreenProps) => {
                     {
                       text: "No",
                       onPress: () => {
-                        // console.log("OK Pressed");
                       },
                     },
                     {

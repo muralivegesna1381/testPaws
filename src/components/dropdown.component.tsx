@@ -73,13 +73,7 @@ type CheckboxDropDownType = {
 type DropDownType = NormalDropDownType | CheckboxDropDownType;
 
 const DropDownComponent = ({ data, allSelectedData, allFilterdData, isOpened, title, dropDownType, isAllRoomsSelected, onButtonCallback, onSelectionCallback, onSelectionAllCallback, ...props }: DropDownType) => {
-
-
-    //console.log("DropDownComponent props : ", JSON.stringify(data));
-
-
     const _renderItem = (item: DropDownItemType, index: number) => {
-
         var isSelected = false;
         if (item.type === 'room') {
             let list = allSelectedData?.filter((itemChild) => itemChild?.facilityLocationId === item.facilityLocationId);
@@ -87,7 +81,6 @@ const DropDownComponent = ({ data, allSelectedData, allFilterdData, isOpened, ti
                 isSelected = true;
             }
         }
-
         let val = ''
         let selectedIndex: number = 0
         if (props.type === 'species') {
@@ -103,7 +96,6 @@ const DropDownComponent = ({ data, allSelectedData, allFilterdData, isOpened, ti
 
         return (
             <Pressable onPress={() => {
-                console.log("index ----- : ", index);
                 // if(dropDownType === 'normal' && item.isSelected === true) {
                 //     return;
                 // }

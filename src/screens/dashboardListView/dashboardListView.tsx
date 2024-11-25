@@ -121,12 +121,13 @@ const DashboardListView = ({
     CommonStyles.textInputStyleSmall
   );
   const [showNoRecords, set_showNoRecords] = useState<boolean>(false);
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<any>(null);
 
   const actSort = useRef("DESC");
   const sortVal = useRef("");
   const [dateSortACT, set_dateSortACT] = useState("DESC");
   //const [sortVal, set_sortVal] = useState("");
+  const monitorData = useSelector((state: RootState) => state.monitorCount);
 
   const [fmtSort, set_fmtSort] = useState("DESC");
   const [dateSortFMT, set_dateSortFMT] = useState("DESC");
@@ -139,17 +140,17 @@ const DashboardListView = ({
   const [actLookUpDataCompleted, set_actLookUpDataCompleted] = useState<ActFilterType[]>([]);
   const [testLookUpData, set_testLookUpData] = useState<TestFilterType[]>([]);
   const [locationLookUpData, set_locationLookUpData] = useState<
-    LocationFilterType[]
+    DataItemType[]
   >([]);
   const [alllocationsLookUpData, set_alllocationsLookUpData] = useState<
-    LocationFilterType[]
+    DataItemType[]
   >([]);
   const [sampleLookUpData, set_sampleLookUpData] = useState<SampleFilterType[]>(
     []
   );
   const [fmtLookUpData, set_fmtLookUpData] = useState<FMTFilterType[]>([]);
   const [notificationReadCount, set_notificationReadCount] = useState(0);
-  const [filterMonitorCount, set_filterMonitorCount] = useState(0)
+  const [filterMonitorCount, set_filterMonitorCount] = useState(-1)
   const [changeInData, setChangeInData] = useState<string>("");
   const [refreshing, setRefreshing] = useState(false);
   const statusFilterData = [{
@@ -159,7 +160,7 @@ const DashboardListView = ({
     "type": "Status"
   },
   {
-    "status": "Mark as failed",
+    "status": "Failed",
     "statusId": 4,
     "isSelected": false,
     "type": "Status"
@@ -174,13 +175,13 @@ const DashboardListView = ({
   const { selectedMonitorID } = route.params;
   const fromDate = useRef("");
   const toDate = useRef("");
-  const locationFilterValue = useRef("");
-  const actFilterValue = useRef("");
-  const testFilterValue = useRef("");
+  const locationFilterValue = useRef<any>("");
+  const actFilterValue = useRef<any>("");
+  const testFilterValue = useRef<any>("");
   const exandedItemIDRef = useRef<MonitorTypes>();
-  const sampleFilterValue = useRef("");
-  const fmtFilterValue = useRef("");
-  const statusFilterValue = useRef("");
+  const sampleFilterValue = useRef<any>("");
+  const fmtFilterValue = useRef<any>("");
+  const statusFilterValue = useRef<any>("");
   const statusID = useRef(1);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const bottomSheetCalenderRef = useRef<BottomSheetModal>(null);
@@ -193,25 +194,21 @@ const DashboardListView = ({
     setBottomSheetVisible(false);
     bottomSheetRef.current?.dismiss();
   };
-  function concatenateUniqueArrays(arr1: any, arr2: any) {
-    // Use a Set to store unique elements from both arrays
-    const uniqueElements = new Set([...arr1, ...arr2]);
-
-    // Convert the Set back to an array
-    return Array.from(uniqueElements);
-  }
-
   useEffect(() => {
     firebaseHelper.reportScreen(firebaseHelper.Screen_Dashboard_List);
     // getMonitorCounts();
+    getLocationFilters(false);
     getNotificationReadCount();
     doGetUserInfo();
+    //console.log("MAIN PAGE DATA", monitorData)
+    // set_data(monitorData.monitorCount);
   }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => {
       getMonitorCounts();
+      getMonitorsData(exandedItemIDRef.current ?? MonitorTypes.PENDING_ANIMAL_TASKS);
       setRefreshing(false);
     }, 1000);
   };
@@ -222,14 +219,13 @@ const DashboardListView = ({
       set_expandIconClicked(false);
       set_dynamicStyle(DashboardStyles.collapsedContainerHeight);
       getMonitorCounts();
-
     }, [navigation])
   );
-
   useEffect(() => {
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({ offset: 0, animated: true });
     }
+    //console.log("VALUE UPDATED");
   }, [pendingACTS, pendingCollections, fmts]);
 
   async function doGetUserInfo() {
@@ -254,7 +250,6 @@ const DashboardListView = ({
     }
 
   }
-
   async function getMonitorCounts() {
     setLoading(true);
     let userID = await Utils.getData("UserId");
@@ -264,7 +259,7 @@ const DashboardListView = ({
         statusID.current
       );
       if (countRes.status.success) {
-        let res = countRes.response.monitors.sort((a, b) =>
+        let res = countRes.response.monitors.sort((a: { monitorName: number; }, b: { monitorName: number; }) =>
           a.monitorName < b.monitorName ? -1 : 1
         );
         set_data(res);
@@ -273,6 +268,7 @@ const DashboardListView = ({
         if (statusID.current === 1) {
           toggleExpansion(selectedMonitorID);
         }
+        getLocationFilters(false);
       }
       else if (countRes?.status?.httpStatus === 400) {
         Alert.alert(
@@ -312,14 +308,16 @@ const DashboardListView = ({
     } catch (e) {
       console.error("Error", e);
     } finally {
-      //setLoading(false);
+      if (statusID.current === 2) {
+        setLoading(false);
+      }
+
     }
   }
   async function getPendingACTList() {
     setLoading(true);
     set_showNoRecords(false);
     let userID = await Utils.getData("UserId");
-    // console.log("sort val-->", sortVal.current);
     try {
       let pendingACTRes = await NetworkManager.getPendingACTList(
         0,
@@ -344,15 +342,12 @@ const DashboardListView = ({
           if (pendingACTRes.response.totalRecords > actTotalCount) {
             setActTotalCount(pendingACTRes.response.totalRecords);
           }
-          console.log(
-            "count hererereerere",
-            pendingACTRes.response.actList,
-            pendingACTRes.response.totalRecords
-          );
           set_filterMonitorCount(pendingACTRes.response.totalRecords);
+          //console.log("TOTAL ACTS", filterMonitorCount);
         } else {
           set_pendingACTS([]);
           set_showNoRecords(true);
+          set_filterMonitorCount(pendingACTRes.response.totalRecords);
           // Alert.alert("Alert!", "No data available for the search criteria.");
         }
       } else {
@@ -380,7 +375,8 @@ const DashboardListView = ({
         fromDate.current,
         toDate.current,
         fmtFilterValue.current,
-        locationFilterValue.current
+        locationFilterValue.current,
+        statusFilterValue.current
       );
       if (fmtRes.status.success && fmtRes.response.fmtList) {
         if (fmtRes.response.fmtList && fmtRes.response.fmtList.length > 0) {
@@ -389,14 +385,10 @@ const DashboardListView = ({
             setfmtTotalCount(fmtRes?.response?.totalRecords);
           }
           set_filterMonitorCount(fmtRes?.response?.totalRecords);
-          // console.log(
-          //   "fmt count hererereerere",
-          //   fmtTotalCount,
-          //   fmtRes.response.totalRecords
-          // );
         } else {
           set_fmts([]);
           set_showNoRecords(true);
+          set_filterMonitorCount(fmtRes?.response?.totalRecords);
           // Alert.alert("Alert!", "No data available for the search criteria.");
         }
       } else {
@@ -442,12 +434,12 @@ const DashboardListView = ({
           // pendingCollectionsRes.response.pendingCollectionList.forEach((obj) => {
 
           //   totalAnimalCount += obj.animalsCount;
-          //   console.log("ANIMAL COUNTS-->", totalAnimalCount);
           // })
           set_filterMonitorCount(pendingCollectionsRes.response.totalCount);
         } else {
           set_pendingCollections([]);
           set_showNoRecords(true);
+          set_filterMonitorCount(pendingCollectionsRes.response.totalCount);
           // Alert.alert("Alert!", "No data available for the search criteria.");
         }
       } else {
@@ -682,13 +674,12 @@ const DashboardListView = ({
       }
       return;
     }
-    //setLoading(true);
+    setLoading(true);
     try {
       //To load all data.
       //To get user prefered specias
       let preferedSpeciesId =
         userData?.userInfo?.response?.preferences?.speciesPreferences?.speciesId;
-      // console.log("preferedSpeciesId", preferedSpeciesId);
       let apiParam = "";
       if (exandedItemIDRef.current === MonitorTypes.PENDING_ANIMAL_TASKS) {
         //add ACT param
@@ -699,10 +690,8 @@ const DashboardListView = ({
         apiParam = "all";
       }
       let lookupLoc = await NetworkManager.getLookUpLocationNames(preferedSpeciesId ?? "", apiParam);
-      //console.log("TEST Location", JSON.stringify(lookupLoc));
       if (lookupLoc?.status?.success) {
         //TO-DO Bottomsheet LOCATION
-        // console.log("res loc", lookupLoc.response);
         const newData: LocationFilterType[] =
           lookupLoc.response.locationlist.map((obj: LocationFilterType) => {
             let counter =
@@ -722,7 +711,6 @@ const DashboardListView = ({
         } else {
           set_locationValue("Location +" + counter);
         }
-        //console.log("method calling from expansion");
         setBottomSheetVisible(true);
         setBottomSheetData(newData);
 
@@ -747,7 +735,6 @@ const DashboardListView = ({
       if (statusID.current === 2) {
         setLoading(false);
       }
-
     }
   }
 
@@ -882,6 +869,7 @@ const DashboardListView = ({
   function tableContents(monitorID: any) {
     if (monitorID === MonitorTypes.PENDING_ANIMAL_TASKS) {
       //pending acts
+      //console.log("CALLING SECOND", pendingACTS);
       return renderInnerItemACTS;
     } else if (monitorID === MonitorTypes.PENDING_FMTS) {
       //fmts
@@ -892,6 +880,7 @@ const DashboardListView = ({
   }
 
   function getMonitorsData(itemId: MonitorTypes) {
+    //console.log("CALLING FIRST", pendingACTS, itemId);
     //call service based on monitor here
     if (itemId === MonitorTypes.PENDING_ANIMAL_TASKS) {
       set_actValue("ACT");
@@ -904,7 +893,6 @@ const DashboardListView = ({
     } else if (itemId === MonitorTypes.PENDINGCOLLECTIONS) {
       set_showTestFilter(true);
       getPendingCollections();
-
     }
   }
 
@@ -951,9 +939,11 @@ const DashboardListView = ({
   };
 
   function getChipCount(monitorId: any, monitorCount: any) {
+    let tempVal = filterMonitorCount;
     if (exandedItemIDRef.current === monitorId) {
-      if (filterMonitorCount) {
-        return filterMonitorCount;
+      //console.log("FILTER MO", filterMonitorCount)
+      if (tempVal >= 0) {
+        return tempVal;
       }
       else {
         return monitorCount;
@@ -964,8 +954,42 @@ const DashboardListView = ({
     }
   }
 
+  function showStatusFilter(showInFMTMonitor: boolean) {
+    return (
+      <View
+        style={showInFMTMonitor ? {
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginBottom: hp("1%"),
+        } :
+          {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: hp("1%"),
+            marginLeft: wp("1%"),
+            marginRight: wp("1%"),
+          }
+        }
+      >
+        <View style={[showInFMTMonitor ? CommonStyles.textInputContainerStyleSmall : CommonStyles.textInputContainerStatusStyleSmall]}>
+          <TouchableOpacity
+            style={filterBorderStatus}
+            onPress={() => {
+              setCurrentFilter("Status");
+              set_FilterTitle("Search Status");
+              set_FilterSearchTitle("Search status")
+              setBottomSheetData(bottomSheetStatusData);
+              bottomSheetRef.current?.present();
+            }}
+          >
+            <Text style={DashboardStyles.buttonText}>{statusValue}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   function resetFilterInputData(clearMonitorData: boolean) {
-    //console.log("method cal");
     fromDate.current = "";
     toDate.current = "";
     actFilterValue.current = "";
@@ -973,6 +997,7 @@ const DashboardListView = ({
     testFilterValue.current = "";
     fmtFilterValue.current = "";
     sampleFilterValue.current = "";
+    statusFilterValue.current = "";
     setActTotalCount(20);
     setfmtTotalCount(20);
     setPendingCollCount(20);
@@ -1020,8 +1045,6 @@ const DashboardListView = ({
 
     setSelectedStartDate(null);
     setSelectedEndDate(null);
-    //console.log("patSevenDate", patSevenDate)
-    // console.log("currentDate", currentDate)
     if (changeInData === '') {
       setChangeInData('change');
     } else if (changeInData === 'change') {
@@ -1166,7 +1189,6 @@ const DashboardListView = ({
                     </TouchableOpacity>
                   </View>
                 ) : null}
-
                 <View style={[CommonStyles.textInputContainerStyleSmall]}>
                   <TouchableOpacity
                     style={filterBorderACT}
@@ -1193,6 +1215,7 @@ const DashboardListView = ({
                     <Text style={DashboardStyles.buttonText}>{actValue}</Text>
                   </TouchableOpacity>
                 </View>
+                {/* {expandedItem === MonitorTypes.PENDING_FMTS && statusID.current === 2 ? showStatusFilter(true) : null} */}
               </View>
             ) : null}
 
@@ -1232,36 +1255,9 @@ const DashboardListView = ({
                 </View>
               </View>
             ) : null}
-
-            {showFilters && statusID.current === 2 ? (
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  marginBottom: hp("1%"),
-                  marginLeft: wp("1%"),
-                  marginRight: wp("1%"),
-                }}
-              >
-                <View style={[CommonStyles.textInputContainerStatusStyleSmall]}>
-                  <TouchableOpacity
-                    style={filterBorderStatus}
-                    onPress={() => {
-                      setCurrentFilter("Status");
-                      set_FilterTitle("Search Status");
-                      set_FilterSearchTitle("Search status")
-                      setBottomSheetData(bottomSheetStatusData);
-                      bottomSheetRef.current?.present();
-                    }}
-                  >
-                    <Text style={DashboardStyles.buttonText}>{statusValue}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+            {showFilters && statusID.current === 2 && expandedItem === MonitorTypes.PENDING_ANIMAL_TASKS ? (
+              showStatusFilter(false)
             ) : null}
-
-
-
             <View style={DashboardStyles.innerFlatList}>
               {tableTitles(item.monitorId)}
               <FlatList
@@ -1305,7 +1301,6 @@ const DashboardListView = ({
                     set_expandIconClicked(false);
                     set_dynamicStyle(DashboardStyles.collapsedContainerHeight);
                   } else {
-                    //console.log("expanded item", expandedItem);
                     if (expandedItem === 5) {
                       getPendingACTList();
                     } else if (expandedItem === 9) {
@@ -1341,7 +1336,7 @@ const DashboardListView = ({
     );
   };
 
-  const renderInnerItemACTS = ({ item }: { item: Item }) => (
+  const renderInnerItemACTS = ({ item }: { item: any }) => (
     <View style={DashboardStyles.rowItem}>
       <Text style={item.actStatusId === 2 || item.actStatusId === 1 ? DashboardStyles.textTinyACT : item.actStatusId === 4 ? DashboardStyles.textTinyFailedACT : DashboardStyles.textTinyNotPerfACT} numberOfLines={1}>
         {item.actName}
@@ -1473,7 +1468,7 @@ const DashboardListView = ({
     </View >
   );
 
-  const renderInnerItemFMTS = ({ item }: { item: Item }) => (
+  const renderInnerItemFMTS = ({ item }: { item: any }) => (
     <View style={DashboardStyles.rowItem}>
       <Text style={DashboardStyles.textTinyFMT} numberOfLines={1}>
         {item.fmtName}
@@ -1487,7 +1482,7 @@ const DashboardListView = ({
     </View>
   );
 
-  const renderInnerItemPendingCollections = ({ item }: { item: Item }) => (
+  const renderInnerItemPendingCollections = ({ item }: { item: any }) => (
     <View style={DashboardStyles.rowItem}>
       <Text style={DashboardStyles.textTinyFMT}>{item.testNum}</Text>
       <Text style={DashboardStyles.textTinyFMTSample}>{item.sampleType}</Text>
@@ -1501,8 +1496,9 @@ const DashboardListView = ({
     set_showFilters(false);
     set_showBottomFilters(false);
     exandedItemIDRef.current = itemId;
-    set_filterMonitorCount(0);
+    set_filterMonitorCount(-1);
     set_testLookUpData([]);
+    //console.log("BEFORE EXPAND", itemId, pendingACTS.length)
     getMonitorsData(itemId);
     setExpandedItem((prevExpandedItem) =>
       prevExpandedItem === itemId ? null : itemId
@@ -1517,7 +1513,7 @@ const DashboardListView = ({
       const getlist = await getNotificationItems(db, userId);
       set_notificationReadCount(getlist.length ?? 0);
     } catch (e) {
-      console.log("Notificaiton Error", e);
+      console.error("Notificaiton Error", e);
     }
 
   }
@@ -1545,7 +1541,7 @@ const DashboardListView = ({
             set_expandIconClicked(false);
             set_dynamicStyle(DashboardStyles.collapsedContainerHeight);
             resetFilterInputData(true);
-            set_filterMonitorCount(0);
+            set_filterMonitorCount(-1);
             getMonitorCounts();
           }}
         >
@@ -1566,7 +1562,7 @@ const DashboardListView = ({
             set_expandIconClicked(false);
             set_dynamicStyle(DashboardStyles.collapsedContainerHeight);
             resetFilterInputData(true);
-            set_filterMonitorCount(0);
+            set_filterMonitorCount(-1);
             getMonitorCounts();
           }}
         >
@@ -1596,15 +1592,12 @@ const DashboardListView = ({
         isVisible={isBottomSheetVisible}
         onClose={handleHidePress}
         applyFilter={(val) => {
-          console.log("apply filter : ", val, currentFilter);
-          // console.log("------- : ", bottomSheetData);
           //setBottomSheetData()
           bottomSheetRef.current?.dismiss();
           if (currentFilter === "ACT") {
 
             //hanlde ACT
             let finalVal = val.filter((result) => result?.isSelected == true);
-            // console.log("final val", finalVal);
             let tempArr = [];
             for (let index = 0; index < finalVal.length; index++) {
               tempArr.push(finalVal[index].actId);
@@ -1621,8 +1614,6 @@ const DashboardListView = ({
             }
             getDataBasedOnExpandedItem();
           } else if (currentFilter === "LOC") {
-
-            // console.log("current filter loc",val);
             set_locationLookUpData(val);
             let finalVal = val.filter((result) => result?.isSelected == true);
             let tempArr = [];
@@ -1640,10 +1631,8 @@ const DashboardListView = ({
             }
             getDataBasedOnExpandedItem();
           } else if (currentFilter === "TEST") {
-
             let finalVal = val.filter((result) => result?.isSelected == true);
             //const result = concatenateUniqueArrays(testLookUpData, val);
-
             ///Esiting  
             // let tempTestData = [...testLookUpData];
 
@@ -1651,18 +1640,13 @@ const DashboardListView = ({
             //   tempTestData.every((element) => {
 
             //     if (item.testId === element.testId) {
-            //       console.log("TEST", "existing ", item.testId)
             //       element.isSelected = item.isSelected;
             //     } else {
-            //       console.log("TEST", "NEW ", item.testId);
-
             //       tempTestData.push(item)
             //     }
-
             //   });
             // })
             set_testLookUpData(val);
-
             // let totalData = [...testLookUpData, ...val]
             // set_testLookUpData(totalData);
             setBottomSheetVisible(false);
@@ -1672,7 +1656,6 @@ const DashboardListView = ({
               tempArr.push(finalVal[index].testNo);
             }
             testFilterValue.current = tempArr;
-            // console.log("TEMP ARR--->", tempArr);
             bottomSheetRef.current?.dismiss();
             if (tempArr.length > 0) {
               set_testValue("Test +" + tempArr.length);
@@ -1766,8 +1749,6 @@ const DashboardListView = ({
           bottomSheetCalenderRef.current?.dismiss();
           fromDate.current = moment(from).format("MM/DD/YYYY");
           toDate.current = moment(to).format("MM/DD/YYYY");
-
-
           if (Utils.getDateBefore(fromDate.current, toDate.current)) {
             set_FilterBorderDate(CommonStyles.textInputStyleOrangeSmall);
             getDataBasedOnExpandedItem();

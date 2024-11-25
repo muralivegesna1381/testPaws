@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
-  ScrollView,
   SafeAreaView,
   RefreshControl,
 } from "react-native";
@@ -130,7 +129,6 @@ const DashboardScreen = ({ route, navigation }: DashboardScreenProps) => {
   // }, []);
   useFocusEffect(
     React.useCallback(() => {
-      //console.log("TEST", "userFouce");
       set_showHint(false);
       getMonitorCounts();
       getNotificationReadCount();
@@ -154,13 +152,11 @@ const DashboardScreen = ({ route, navigation }: DashboardScreenProps) => {
         var userSkippedBiometrics = await Utils.getData(
           "userSkippedBiometrics"
         );
-        //console.log("var-------->", userSkippedBiometrics);
         if (userSkippedBiometrics === "true") {
           set_userSkipped(true);
         } else {
           set_userSkipped(false);
         }
-        //console.log("main val-->", userSkipped);
       } catch (error) {
         console.error("Error retrieving data from AsyncStorage:", error);
       }
@@ -181,10 +177,7 @@ const DashboardScreen = ({ route, navigation }: DashboardScreenProps) => {
 
         Utils.synchACTData(userID ?? '0');
       }, MINUTE_MS);
-    } else {
-      // console.log("==SYNCH==", count?.length,)
     }
-
   }
   async function getUserInfo() {
     let userId = await Utils.getData("UserId");
@@ -227,13 +220,11 @@ const DashboardScreen = ({ route, navigation }: DashboardScreenProps) => {
     setLoading(true);
     try {
       let countRes = await NetworkManager.getDashboardMonitorCounts("", 1);
-      //console.log("TEST DASHBOARD--->", countRes);
       if (countRes?.status?.success) {
         let res = countRes.response.monitors.sort(
           (a: { monitorName: number }, b: { monitorName: number }) =>
             a.monitorName < b.monitorName ? -1 : 1
         );
-        //console.log("res-->", res);
         //set_data(res);
         dispatch(saveMonitorCount(res));
         set_notificationCount(countRes?.response?.notificationCount);
@@ -301,11 +292,11 @@ const DashboardScreen = ({ route, navigation }: DashboardScreenProps) => {
   async function getNotificationReadCount() {
     try {
       let db = await getDBConnection();
-      let userId = await Utils.getData("UserId");
+      let userId: string = await Utils.getData("UserId") ?? "";
       const getlist = await getNotificationItems(db, userId);
       set_notificationReadCount(getlist.length ?? 0);
     } catch (e) {
-      console.log("Notificaiton Error", e);
+      console.error("Notificaiton Error", e);
     }
 
   }

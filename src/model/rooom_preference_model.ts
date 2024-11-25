@@ -1,4 +1,5 @@
 export interface UserInfo {
+  errors: any;
   status: Status;
   response: UserInfo_Response;
 }

@@ -147,14 +147,12 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
                 {
                     text: "Yes",
                     onPress: () => {
-                        // console.log("OK Pressed");
                         generateAndSharePdf();
                     },
                 },
                 {
                     text: "No",
                     onPress: () => {
-                        // console.log("OK Pressed");
                     },
                 },
             ],
@@ -186,8 +184,6 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
     }
 
     function resetFilterInputData(clearMonitorData: boolean) {
-        //console.log("method cal");
-
         entityTypeFilterValue.current = "";
         userFilterValue.current = "";
         entityFilterValue.current = "";
@@ -232,8 +228,6 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
                 entityFilterValue.current ?? "",
                 userFilterValue.current ?? "",
             );
-            // console.log("auditDetails-->", auditDetails);
-
             if (auditDetails?.status?.success) {
                 if (auditDetails?.response && auditDetails?.response?.length > 0) {
                     set_showNoRecords(false);
@@ -301,10 +295,7 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
 
         setLoading(true);
         try {
-            console.log("auditEntity ---- ");
-
             let auditEntity = await AuditLogAPIManager.getAuditEntity();
-            // console.log("auditEntity ---- ", auditEntity);
             if (auditEntity.status.success) {
                 //TO-DO Bottomsheet FMTs
                 const newData: EntityFilter[] = auditEntity.response.map(
@@ -312,8 +303,6 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
                         return { ...obj, isSelected: false, type: "Entity" };
                     }
                 );
-                //console.log("auditEntity 2 ---- ", newData);
-
                 setBottomSheetVisible(true);
                 setBottomSheetData(newData);
                 set_entityAuditData(newData);
@@ -344,8 +333,6 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
             let lookupUsers = await AuditLogAPIManager.getLookUpUsers();
             if (lookupUsers?.status?.success) {
                 //TO-DO Bottomsheet User
-                // console.log("res User", lookupUsers.response);
-
                 const newData: UserFilter[] = lookupUsers.response.map(
                     (obj: UserFilter) => {
                         return { ...obj, isSelected: false, type: "User" };
@@ -410,7 +397,6 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
 
     // const onDayPress = (day: any) => {
     //     if (!selectedStartDate || selectedEndDate) {
-    //         console.log("First date")
     //         setSelectedStartDate(day.dateString);
     //         setSelectedEndDate(null);
     //         setMarkedDates({
@@ -424,7 +410,6 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
     //         });
     //     } else {
     //         // Select end date
-    //         console.log("Second date")
     //         setSelectedEndDate(day.dateString);
     //         let range = {};
     //         let startDate = moment(selectedStartDate);
@@ -903,8 +888,6 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
 
                     } else if (currentFilter === "USER") {
                         firebaseHelper.logEvent(firebaseHelper.Event_Audit_Log_User_Filter, firebaseHelper.Screen_Audit_Log, "");
-
-                        // console.log("current filter user");
                         let finalVal = val.filter((result) => result?.isSelected == true);
                         let tempArr = [];
                         for (let index = 0; index < finalVal.length; index++) {
@@ -946,12 +929,9 @@ const AuditLogScreen = (props: moreTabsScreenProps) => {
                     firebaseHelper.logEvent(firebaseHelper.Event_Audit_Log_Date_Filter, firebaseHelper.Screen_Audit_Log, "");
 
                     //throw new Error("Function not implemented.");
-                   // console.log("HRERERE", fromDate, toDate);
                     bottomSheetCalenderRef.current?.dismiss();
                     fromDate.current = moment(from).format("MM/DD/YYYY");
                     toDate.current = moment(to).format("MM/DD/YYYY");
-
-
                     if (Utils.getDateBefore(fromDate.current, toDate.current)) {
                         set_FilterBorderDate(CommonStyles.textInputStyleOrangeSmall);
                         getAuditDetailsList();

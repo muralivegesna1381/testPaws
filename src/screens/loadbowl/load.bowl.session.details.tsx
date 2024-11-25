@@ -51,7 +51,6 @@ const LoadBowlSessionDetailScreen = (props: loadBowlSessionDetailsScreenProps) =
     const insets = useSafeAreaInsets();
 
     const onPressBackButton = () => {
-        console.log("onPressBackButton");
         navigation.navigate('LoadBowlDetailsScreen', {
             selectionType: "scanbowl"
         });
@@ -68,10 +67,8 @@ const LoadBowlSessionDetailScreen = (props: loadBowlSessionDetailsScreenProps) =
     async function getBowlSessions() {
         try {
             // set_isLoading(true);
-            console.log(sessionObject.FEEDING_SESSION_ID);
             let sessionDetails = await LoadBowlAPIManager.getfeedingAnimalSessions(sessionObject.FEEDING_SESSION_ID);
             // set_isLoading(false);
-            console.log(sessionDetails);
             if (sessionDetails.result && sessionDetails.result.FeedingAnimalSessions && sessionDetails.result.FeedingAnimalSessions.length) {
                 let dataList: SessionDetailObject = sessionDetails.result.FeedingAnimalSessions;
                 setSessionDetailsList(dataList);

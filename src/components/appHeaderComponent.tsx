@@ -50,7 +50,6 @@ const AppHeaderComponent = ({ headerTitle, moduleName, headerColor, isShowNotesB
   }, []);
 
   const editAction = () => {
-    //console.log("edit action");
     navigation.navigate("NotesScreen");
   };
 
@@ -63,16 +62,11 @@ const AppHeaderComponent = ({ headerTitle, moduleName, headerColor, isShowNotesB
   };
 
   const notificationAction = async () => {
-    //console.log("notification icon action");
-    //console.log(props);
     navigation.navigate("NotificationHome");
     var token = await Utils.getData("Token");
-    //console.log("TEST token", token);
   };
 
   const btnAction = () => {
-
-    //console.log("grid action ", moduleName);
     if (moduleName === "Dashboard_List") {
       listAction();
     } else {

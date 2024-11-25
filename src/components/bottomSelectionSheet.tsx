@@ -65,7 +65,6 @@ const SelectionBottomSheet = forwardRef<BottomSheetModal, Props>(
                             .toLowerCase()
                             .includes(searchString.toLowerCase());
                     });
-                    //console.log("FILTER", _filteredData);
                     setFilteredData(_filteredData);
                 } else if (searchString.length === 0) {
                     setFilteredData([]);
@@ -122,7 +121,6 @@ const SelectionBottomSheet = forwardRef<BottomSheetModal, Props>(
                             return (
                                 <Pressable
                                     onPress={() => {
-                                        //console.log('pressed', item.userName)
                                         applyFilter(item)
                                     }}
                                     style={BottomSheetStyle.rowItemStyle}

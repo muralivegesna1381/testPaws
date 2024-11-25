@@ -41,8 +41,8 @@ type Props = {
     data: string;
     isVisible: boolean;
     onClose: () => void;
-    fromDate: string;
-    toDate: string;
+    fromDate: string| null;
+    toDate: string|null;
     applyFilter: (fromDate: string, toDate: string) => void;
 };
 type Ref = BottomSheetModal;
@@ -69,8 +69,6 @@ const DateBottomSheet = forwardRef<BottomSheetModal, Props>(
             []
         );
         useEffect(() => {
-           // console.log("DATATATA", fromDate, toDate, data);
-            //console.log("USESTATE DATES-->", selectedStartDate, selectedEndDate)
             setSelectedStartDate(fromDate);
             setSelectedEndDate(toDate);
             // setSelectedStartDate(formatDate(sevenDaysAgo));
@@ -85,7 +83,6 @@ const DateBottomSheet = forwardRef<BottomSheetModal, Props>(
                     //         .toLowerCase()
                     //         .includes(searchString.toLowerCase());
                     // });
-        //             console.log("FILTER", _filteredData);
         //             setFilteredData(_filteredData);
         //         } else if (searchString.length === 0) {
         //             setFilteredData([]);
@@ -112,8 +109,6 @@ const DateBottomSheet = forwardRef<BottomSheetModal, Props>(
 
         const getMarkedDates = () => {
             const markedDates: { [key: string]: any } = {};
-            //console.log("START===--->", selectedStartDate)
-            //console.log("ENDDATE====---->", selectedEndDate)
             if (selectedStartDate) {
                 markedDates[selectedStartDate] = { startingDay: true, color: 'lightblue' };
             }
@@ -171,7 +166,6 @@ const DateBottomSheet = forwardRef<BottomSheetModal, Props>(
                         <Pressable
                             style={{ borderRadius: 25, backgroundColor: "rgba(255, 111, 12, 0.2)", padding: 15, width: wp("85%"), borderColor: "#FF6F0C", borderWidth: 1 }}
                             onPress={() => {
-                                //console.log("Apply action");
                                 applyFilter(selectedStartDate, selectedEndDate);
                             }}
                         >

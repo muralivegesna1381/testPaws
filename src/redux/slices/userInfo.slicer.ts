@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { UserInfo } from "../../model/rooom_preference_model";
 const userInfoSlicer = createSlice({
   name: "UserInfo",
-  initialState: [],
+  initialState: {},
   reducers: {
     ///User information list prefernce and rooms
     saveUserInfo(state, action) {

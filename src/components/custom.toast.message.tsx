@@ -12,16 +12,16 @@ export const showToast = async (message: string, type: string) => {
             const vibrationPattern = [0, 500]; // [delay, vibrate, delay, vibrate]
 
             if (error) {
-                console.log('Failed to load the sound', error);
+                console.error('Failed to load the sound', error);
             }
             Vibration.vibrate(vibrationPattern);
 
             beepSound.play((success) => {
-                if (success) {
-                    console.log('Sound played successfully');
-                } else {
-                    console.log('Sound playback failed');
-                }
+                // if (success) {
+                //     console.log('Sound played successfully');
+                // } else {
+                //     console.log('Sound playback failed');
+                // }
             });
 
             Toast.show({

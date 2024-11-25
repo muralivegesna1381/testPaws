@@ -106,10 +106,6 @@ const MoreTabsScreen = ({ route }: moreTabsScreenProps) => {
     } else {
       setStatusMessage('');
     }
-    recodsCount?.forEach((item) => {
-      console.log("RECODS COUNT", item.act_count, "=>", item.act_id);
-    });
-    console.log("RECODS COUNT", recodsCount.length)
   }
 
   async function dataSycn() {
@@ -133,7 +129,6 @@ const MoreTabsScreen = ({ route }: moreTabsScreenProps) => {
   function renderItem(item: ListItem, needToShow: boolean) {
     return (<Pressable
       onPress={() => {
-        console.log("pressed itesm", item.id);
         if (item.id === "4") {
           firebaseHelper.logEvent(firebaseHelper.Event_Settings_Button, firebaseHelper.Screen_More_Info, "");
           navigation.navigate("SettingsScreen");
@@ -149,7 +144,6 @@ const MoreTabsScreen = ({ route }: moreTabsScreenProps) => {
         } else
           if (item.id === "5") {
             firebaseHelper.logEvent(firebaseHelper.Event_Data_Sync_Button, firebaseHelper.Screen_More_Info, "");
-            console.log("TEST RECORD_STATUS:", statusMessage)
             if (statusMessage === RECORD_STATUS.PENDING) {
               dataSycn();
             }

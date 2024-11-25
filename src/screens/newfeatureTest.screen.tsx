@@ -1,14 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Text, TextInput, View } from 'react-native'
-import DropDownComponent, { RoomType, SpeciesType } from '../components/dropdown.component'
 import _ from 'lodash'
 import loadBowlDetailstyles from '../styles/load.bowl.details.style'
-//const data: SpeciesType[] = 
 
 const NewFeatureScreen = () => {
     const [isViewOpened, setViewOpened] = useState(true)
-    const [selectedIndex, setSelectedIndex] = useState(0);
-
     const [focusedInputIndex, setFocusedInputIndex] = useState(0)
     const bowlTextInputRef = useRef<TextInput>(null);
     const feederTextInputRef = useRef<TextInput>(null);
@@ -18,7 +14,6 @@ const NewFeatureScreen = () => {
             bowlTextInputRef.current.focus()
         }
     }, [bowlTextInputRef.current])
-
     useEffect(() => {
         if (feederTextInputRef.current && focusedInputIndex == 1) {
             feederTextInputRef.current.focus()
@@ -33,7 +28,6 @@ const NewFeatureScreen = () => {
             </View> :
                 <View style={{ flex: 1, backgroundColor: 'red', alignItems: 'center' }}>
                     <Text onPress={() => setViewOpened(true)}>Hello</Text>
-
                     <TextInput
                         ref={bowlTextInputRef}
                         style={[loadBowlDetailstyles.searchContainerStyle, { backgroundColor: 'transparent', marginLeft: 15, }]}

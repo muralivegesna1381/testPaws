@@ -29,17 +29,13 @@ const SettingsScreen = ({ route, navigation }: moreTabsScreenProps) => {
   const onToggleSwitch = () => {
     setIsSwitchOn(!isSwitchOn);
     Utils.storeData("isBiometricsEnabled", "" + !isSwitchOn);
-    // console.log("biometrics toggled-->", !isSwitchOn);
     if (isSwitchOn) {
       firebaseHelper.logEvent(firebaseHelper.Event_FaceID_On, firebaseHelper.Screen_Settings, "")
       showToast("Face Scan/PIN is disabled.", "info");
-
       // Utils.showToastMessageInCenter("Face Scan/PIN is disabled");
     } else {
       firebaseHelper.logEvent(firebaseHelper.Event_FaceID_Off, firebaseHelper.Screen_Settings, "");
-
       showToast("Face Scan/PIN is enabled.", "info");
-
       // Utils.showToastMessageInCenter("Face Scan/PIN is enabled");
     }
   };

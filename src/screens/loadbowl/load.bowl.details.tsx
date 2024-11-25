@@ -56,7 +56,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
     const insets = useSafeAreaInsets();
 
     useEffect(() => {
-        console.log("bowlTextInputRef.current : ", bowlTextInputRef.current);
         if (bowlTextInputRef.current && focusedInputIndex == 0) {
             bowlTextInputRef.current.focus()
         }
@@ -76,14 +75,12 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            console.log("useFocusEffect : ", focusedInputIndex);
             if (bowlTextInputRef.current && focusedInputIndex == 0) {
                 bowlTextInputRef.current.focus()
                 set_SelectedBarCodeType('Bowl Barcode');
                 // setOpenScanner(true);
             }
             if (feederTextInputRef.current && focusedInputIndex == 1) {
-                console.log("useFocusEffect : ", enableAutoFocusCamera);
                 if (enableAutoFocusCamera) {
                     setOpenScanner(true);
                 } else {
@@ -94,16 +91,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
             }
         }, [focusedInputIndex, enableAutoFocusCamera])
     )
-
-    useEffect(() => {
-        console.log("focusedInputIndex useEffect : ", focusedInputIndex);
-    }, [focusedInputIndex])
-
-    useEffect(() => {
-        console.log("openScanner: ", openScanner);
-
-    }, [openScanner])
-
     async function getBowlDetails(bowlId: string, navigateToSession: boolean) {
         if (bowlId.length == 0) {
             // ToastLoader("Please enter the bowl Id.");
@@ -135,11 +122,8 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
                 setOpenScanner(true);
                 showToast("Sorry! Bowl not found", "info");
             }
-            console.log("TEST RES------> ", bowlRes);
-
         } catch (e) {
             set_isLoading(false);
-            console.error('Error----->', e);
         } finally {
             set_isLoading(false);
         }
@@ -153,9 +137,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
             let data = [{ "feedingSession": sessionObject.FEEDING_SESSION_ID, "sessionStatusId": sessionObject.SESSION_STATUS_ID == "P" ? "I" : "C" }];
             let bowlRes = await LoadBowlAPIManager.updateSessionStatus(data);
             let sessionDetails = await LoadBowlAPIManager.getSessionDetail(bowlText);
-            console.log("sessionDetails")
-            console.log(sessionDetails)
-
             if (sessionDetails.result && sessionDetails.result.FeedingSessions && sessionDetails.result.FeedingSessions.length) {
                 let dataList = sessionDetails.result.FeedingSessions;
                 setSessionsList(dataList);
@@ -178,9 +159,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
         try {
 
             let sessionDetails = await LoadBowlAPIManager.getSessionDetail(bowlId);
-            console.log("sessionDetails")
-            console.log(sessionDetails)
-
             if (sessionDetails.result && sessionDetails.result.FeedingSessions && sessionDetails.result.FeedingSessions.length) {
                 let dataList = sessionDetails.result.FeedingSessions;
                 setSessionsList(dataList);
@@ -201,7 +179,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
 
                     set_isLoading(false);
                     if (isEnable) {
-                        console.log("Remove loader");
                         set_selectedCategory('Load Bowl');
                         set_SelectedBarCodeType('Feeder Barcode');
                         // setOpenScanner(true);
@@ -222,18 +199,12 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
             }
 
         } catch (e) {
-            console.log(e)
+            console.error(e)
             set_isLoading(false);
         } finally {
             set_isLoading(false);
         }
     }
-
-    // const handleCallback = () => {
-    // set_EnableAutoFocusCamera(true);
-    //     console.log("Callback executed!");
-    // };
-
     function checkAnyPendingSession(dataList: any) {
         for (var index = 0; index < dataList.length; index++) {
             if (dataList[index].FEEDING_SESSION_ID == dataList[index].BOWL_SESSION_ID) {
@@ -308,7 +279,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
                         "&usr=" +
                         userID;
                     let res = await LoadBowlAPIManager.setLoadBowlDetails(data);
-                    console.log(res);
                     set_isLoading(false);
                     if (res.code == -1) {
                         firebaseHelper.logEvent(firebaseHelper.Event_Submit_Bowl_Fail, firebaseHelper.Screen_Loadbowl_Scan, "");
@@ -397,23 +367,12 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
 
 
     const unFocuseInputFields = () => {
-        console.log("unFocuseInputFields ");
-        console.log("bowlTextInputRef -----> ", bowlTextInputRef);
-        console.log("feederTextInputRef -----> ", feederTextInputRef);
-
         Keyboard.dismiss();
         bowlTextInputRef.current?.blur();
         feederTextInputRef.current?.blur();
-        console.log("bowlTextInputRef -----> ", bowlTextInputRef);
-        console.log("feederTextInputRef -----> ", feederTextInputRef);
-
     }
 
     const cameraCancelCallback = () => {
-        console.log("bowlDetailsObj------> ", bowlDetailsObj);
-        console.log("selectedCategory -----> ", selectedCategory);
-        // console.log("bowlTextInputRef -----> ", bowlTextInputRef.current);
-        // console.log("feederTextInputRef -----> ", feederTextInputRef.current);
         if (selectedCategory == 'Scan Bowl') {
             set_SelectedBarCodeType('Bowl Barcode');
             setFocusedInputIndex(0);
@@ -460,10 +419,8 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
                         borderRadius: 6
                     }}
                     onPress={() => {
-                        console.log(bowlDetailsObj)
                         if (selectedCategory == 'Scan Bowl') {
                             firebaseHelper.logEvent(firebaseHelper.Event_Loadbowl_Button_Tab, firebaseHelper.Screen_Loadbowl_Scan, "");
-
                             set_selectedCategory('Load Bowl');
                             if (bowlDetailsObj != null && feederBarCode.length == 0) {
                                 set_SelectedBarCodeType('Feeder Barcode')
@@ -495,7 +452,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
                         borderRadius: 6
                     }}
                     onPress={() => {
-                        console.log(bowlDetailsObj)
                         if (selectedCategory == 'Scan Bowl') {
                             firebaseHelper.logEvent(firebaseHelper.Event_Loadbowl_Button_Scan, firebaseHelper.Screen_Loadbowl_Scan, "");
                             set_selectedCategory('Load Bowl');
@@ -585,8 +541,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
     }
 
     const _renderTextInput = () => {
-        console.log("focusedInputIndex -------- : ", focusedInputIndex, focusedInputIndex == 1);
-
         return (
             <TextInput
                 ref={feederTextInputRef}
@@ -697,7 +651,6 @@ const LoadBowlDetailsScreen = (props: loadbowlScreenProps) => {
                                         <BottomButtonComponent
                                             title={selectedCategory == 'Scan Bowl' ? 'Load Bowl' : 'Scan Bowl'}
                                             buttonClick={() => {
-                                                console.log(bowlDetailsObj)
                                                 if (selectedCategory == 'Scan Bowl') {
                                                     set_selectedCategory('Load Bowl');
                                                     if (bowlDetailsObj != null && feederBarCode.length == 0) {

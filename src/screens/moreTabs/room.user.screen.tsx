@@ -74,8 +74,6 @@ const RoomUserMonitor = ({ route }: moreTabsScreenProps) => {
   }, []);
 
   useEffect(() => {
-    console.log("searchText");
-
     const minLength = 2; //(selectedSegment === AnimalSegments.Location) ? 1 : 3
     if (searchText.length >= minLength) {
       onChangeDebounced();
@@ -250,16 +248,10 @@ const RoomUserMonitor = ({ route }: moreTabsScreenProps) => {
               }
 
               const dupCopy = JSON.parse(JSON.stringify(roomListDisplay ?? []));
-
-              //const keysList = dupCopy.map((item: Data) => item.key);
               const isKeyContain = dupCopy.map(
                 (item: Data) => item.key == data.key
               );
-
-              //console.log("condition.", dupCopy && keysList.indexOf(data.key));
-
               if (!isKeyContain[0] || isKeyContain.length == 0) {
-                console.log("entered");
                 const listData: Data = data;
                 const updatedData = [...dupCopy, listData];
                 setRoomListDisplay(updatedData);
@@ -269,19 +261,13 @@ const RoomUserMonitor = ({ route }: moreTabsScreenProps) => {
               if (!users.includes(data.key)) {
                 setUsers([...users, data.key]);
               }
-
-
               const dupCopy = JSON.parse(
                 JSON.stringify(usersListDisplay ?? [])
               );
-
               //const keysList = dupCopy.map((item: Data) => item.key);
               const isKeyContain = dupCopy.map(
                 (item: Data) => item.key == data.key
               );
-
-              //console.log("condition.", dupCopy && keysList.indexOf(data.key));
-
               if (!isKeyContain[0] || isKeyContain.length == 0) {
 
                 const listData: Data = data;
@@ -311,7 +297,6 @@ const RoomUserMonitor = ({ route }: moreTabsScreenProps) => {
       <View style={[styles.searchSuggestion]}>
         <Pressable
           onPress={() => {
-            console.log("onPress");
             setIsSuggestionVisible(false);
           }}
         >
@@ -436,6 +421,9 @@ const SearchUI: React.FC<SerachUIProps> = (props) => {
   return (
     <View style={styles.search}>
       <View style={styles.SearchUI}>
+        {/* <View style={styles.SearchImage}>
+          <Search />
+        </View> */}
         <TextInput
           style={styles.searchContainerStyle}
           onChangeText={(text) => {
@@ -446,16 +434,15 @@ const SearchUI: React.FC<SerachUIProps> = (props) => {
         />
       </View>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => {
-          //console.log("TEST", props.searchText);
           //props.addToList();
         }}
       >
         <View style={styles.SearchImage}>
           {props.isInProgress ? <ActivityIndicator /> : <Search />}
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -537,7 +524,6 @@ const RowRoomItem: React.FC<RowItemProps> = (props) => {
         renderItem={(item) => (
           <View>
             {item.item.userName ? <CustomChip style={{ width: wp('29%'), alignSelf: 'flex-start' }} textLable={item.item.userName} onClose={function (): void {
-              console.log("onClose");
             }} isEnableClose={false} backgroundColor={Colors.CHIP_COLOR} /> : <Text style={[CommonStyles.textStyleLight, { marginLeft: 10, marginBottom: 5, fontSize: 14 }]}>No matching records found</Text>}
           </View>
         )}
@@ -559,7 +545,6 @@ const RowUserItem: React.FC<RowItemProps> = (props) => {
         renderItem={(item) => (
           <View>
             {item.item.room ? <CustomChip style={{ width: wp('29%'), alignSelf: 'flex-start' }} textLable={item.item.room} onClose={function (): void {
-              console.log("onClose");
             }} isEnableClose={false} backgroundColor={Colors.CHIP_COLOR} /> : <Text style={[CommonStyles.textStyleLight, { marginLeft: 10, marginBottom: 5, fontSize: 14 }]}>No matching records found.</Text>}
           </View>
         )}
@@ -643,13 +628,8 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   SearchImage: {
-    height: 36,
-    width: 36,
-    backgroundColor: "#C3CFD6",
-    borderRadius: 6,
-    alignItems: "center",
-    alignSelf: "center",
-    justifyContent: "center",
+   // justifyContent: "center",
+
   },
   ChipStype: {
     width: width / 2.3,

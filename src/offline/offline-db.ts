@@ -33,7 +33,6 @@ act_id INTEGER,
 sync_status BLOB DEFAULT (0),
 user_id TEXT,
 createdOn TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`;
-  //console.log("query", query);
   let reulst = await db.executeSql(query);
 
 };
@@ -53,7 +52,6 @@ export const saveRequestObject = async (
       `INSERT OR IGNORE INTO  ${_tableName}(url, request_body, act_count, act_id,sync_status,user_id) values` +
       `('${i.url}','${i.request_body}',${i.act_count} ,${i.act_id},'${i.sync_status}',${i.user_id} )`;
 
-    //console.log("Qry", insertQuery);
     return db.executeSql(insertQuery);
   } catch (e) {
     console.error(e);
@@ -71,7 +69,6 @@ export const deleteRecordByUserId = async (
   user_id: number
 ) => {
   const deleteQuery = `DELETE from ${_tableName} where user_id = ${user_id}`;
-  //console.log("deleteQuery", deleteQuery);
   var result = await db.executeSql(deleteQuery);
   return result;
 };
@@ -81,7 +78,6 @@ export const deleteRecordByRecordId = async (
   recordId: number
 ) => {
   const deleteQuery = `DELETE from ${_tableName} where _id= ${recordId}`;
- // console.log("deleteQuery", deleteQuery);
   var result = await db.executeSql(deleteQuery);
   return result;
 };
@@ -110,7 +106,6 @@ export const getAllItems = async (
     });
     return notifyItems;
   } catch (error) {
-   // console.log("Notificaion DB", error);
     return notifyItems;
   }
 };

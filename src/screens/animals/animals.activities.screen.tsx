@@ -19,7 +19,6 @@ import {
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
-
 import SearchIcon from "./../../../assets/svgs/search.svg";
 import MeasurementIcon from "./../../../assets/svgs/measurementIcon.svg";
 import TaskIcon from "./../../../assets/svgs/taskIcon.svg";
@@ -43,7 +42,8 @@ import { useDispatch } from "react-redux";
 import { updateStack } from "../../redux/slices/login.slicer";
 import { AnimalResponse } from "../../model/schedule_animals";
 import * as firebaseHelper from "../../utilities/firebase/firebaseHelper";
-import { BASE_URL } from "../../network/api.constants";
+import { BASE_URL } from "../../../App";
+
 
 
 let empty_animal = require("./../../../assets/pngs/empty_animal.png");
@@ -146,7 +146,6 @@ const AnimalActivitiesScreen = (props: AnimalScreenProps) => {
             //     {
             //       text: "OK",
             //       onPress: () => {
-            //         // console.log("OK Pressed");
             //         navigateToPreviousScreen();
             //       },
             //     },
@@ -176,7 +175,6 @@ const AnimalActivitiesScreen = (props: AnimalScreenProps) => {
             //     {
             //       text: "OK",
             //       onPress: () => {
-            //         // console.log("OK Pressed");
             //         navigateToPreviousScreen();
             //       },
             //     },
@@ -193,7 +191,6 @@ const AnimalActivitiesScreen = (props: AnimalScreenProps) => {
             {
               text: "Login again",
               onPress: () => {
-                // console.log("OK Pressed");
                 dispatch(updateStack({ stackName: "Auth" }));
               },
             },
@@ -445,9 +442,7 @@ const AnimalActivitiesScreen = (props: AnimalScreenProps) => {
           <TouchableOpacity
             testID="renderItem"
             onPress={() => {
-             // console.log("tasks main-->", item.actClassificationId, item.actId, type, selectedItem, item);
               firebaseHelper.logEvent(firebaseHelper.Event_Select_Measurement_ACT, firebaseHelper.Screen_Animals, "");
-
               navigation.navigate("Tasks", {
                 actId: item.actId,
                 type: type,
@@ -466,8 +461,8 @@ const AnimalActivitiesScreen = (props: AnimalScreenProps) => {
                 actScheduleId: "",
                 actScheduleDate: "",
                 isFromDashboard: false,
-                dateFilterFrom:"",
-                dateFilterTo:""
+                dateFilterFrom: "",
+                dateFilterTo: ""
               });
             }}
           >
@@ -578,7 +573,6 @@ const AnimalActivitiesScreen = (props: AnimalScreenProps) => {
                             selectedAnimals: response,
                             type: 3,
                             onRquiredRefrs(val) {
-                             // console.log("onRquiredRefrs", val);
                               if (val) {
                                 // getScheduledAnimals()
                               }
@@ -608,7 +602,9 @@ const AnimalActivitiesScreen = (props: AnimalScreenProps) => {
                         isRecordGroupAct: true,
                         actScheduleId: "",
                         actScheduleDate: "",
-                        isFromDashboard: false
+                        isFromDashboard: false,
+                        dateFilterFrom: "",
+                        dateFilterTo: ""
                       });
                     }
 
@@ -669,8 +665,8 @@ const AnimalActivitiesScreen = (props: AnimalScreenProps) => {
                 actScheduleId: "",
                 actScheduleDate: "",
                 isFromDashboard: false,
-                dateFilterFrom:"",
-                dateFilterTo:""
+                dateFilterFrom: "",
+                dateFilterTo: ""
               });
             }}
           >
@@ -820,7 +816,6 @@ const SearchUI: React.FC<SerachUIProps> = (props) => {
 
       <TouchableOpacity
         onPress={() => {
-          //console.log("TEST", props.searchText);
           props.addToList();
         }}
       >
@@ -976,8 +971,3 @@ const styles = StyleSheet.create({
 });
 
 export default AnimalActivitiesScreen;
-
-function navigateToPreviousScreen() {
-  throw new Error("Function not implemented.");
-}
-

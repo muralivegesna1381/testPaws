@@ -98,7 +98,6 @@ const RoomPreferenceScreen = ({
     setValueSpecies(name ?? "Select Default Species");
     let preferedSpeciesId =
       response?.response?.preferences?.speciesPreferences?.speciesId ?? '0';
-    //console.log("User info", preferedSpeciesId, name);
     let speciesResponse: Species = await NetworkManager.getSpeciesList();
     let speciesList: SpeciesType[] = speciesResponse?.response;
     speciesList.forEach((t) => {
@@ -124,26 +123,28 @@ const RoomPreferenceScreen = ({
       );
       let rooms: RoomType[] = locationRes?.response?.locationlist;
 
-      console.log("RoomType length", rooms?.length, response);
-      var tempList = [...roomSelectedList];
-      const _rooms = response?.response?.preferences?.locationPreferences;
+
+
+      var tempSelectedList: RoomType[] = [];
+
+      var _rooms = response?.response?.preferences?.locationPreferences;
       rooms.forEach((t) => {
         t.type = "room";
         let counter = _rooms?.filter(
-          (item: RoomType) => item.room === t.room
-        ).length;
+          (item: RoomType) => item.room === t.room).length;
         if (counter > 0) {
           t.isSelected = true;
-          tempList.push(t);
-          //  var tempList = [...roomSelectedList, counter]
+
+          tempSelectedList.push(t);
+
         }
       });
 
-      setRoomSelctedList(tempList);
+      setRoomSelctedList(tempSelectedList);
       setRoomData(rooms);
       //TODO need udpate global data
       setRoomDataGlobal(rooms);
-      setRoomDataFIlter(rooms);
+      //setRoomDataFIlter(rooms);
 
       setLocations(rooms);
 
@@ -153,15 +154,28 @@ const RoomPreferenceScreen = ({
       })
       const uniqueData = [...new Set(temp)];
       setBuildingList(uniqueData)
-      setSelectedBuildingList(uniqueData)
 
+      var temp2: any[] = [];
+      tempSelectedList.map((item: RoomType) => {
+        temp2 = [...temp2, item.buildingCode]
+      })
+      const uniqueData2 = [...new Set(temp2)];
+      setSelectedBuildingList(uniqueData2)
       let pp = rooms.filter((ele, ind) => ind === rooms.findIndex(elem => elem.buildingCode === ele.buildingCode))
+
       setBuildings(pp)
+      var temp3: RoomType[] = [];
+      uniqueData2.forEach(item => {
+        const updatedItems = rooms.filter(itemVal => itemVal.buildingCode === item);
+        temp3 = [...temp3, ...updatedItems];
+      })
+      setRoomDataFIlter(temp3)
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
+
   }
 
   const chipsVies = (ob: RoomType) => {
@@ -171,17 +185,9 @@ const RoomPreferenceScreen = ({
         textLable={ob?.room ?? ""}
         textLableStyle={[CommonStyles.textStyleRegular, { fontSize: 14 }]}
         onClose={function (): void {
-          console.log("On close", ob.room);
           const updatedItems = roomSelectedList.filter(itemVal => itemVal.facilityLocationId !== ob.facilityLocationId);
           setRoomSelctedList(updatedItems);
-          // const _data = _.cloneDeep(roomdata);
-          // //console.log("_data[index] : ", index, _data);
-          // let index = _data.findIndex(
-          //   (obj) => obj.facilityLocationId === ob.facilityLocationId
-          // );
-          // console.log("index", index);
-          // _data[index].isSelected = false;
-          // setRoomData(_data);
+
         }}
         isEnableClose={true}
         backgroundColor={Colors.CHIP_COLOR}
@@ -195,6 +201,7 @@ const RoomPreferenceScreen = ({
       <Pressable
         onPress={() => {
           let tempRoom = [...roomdataGlobal];
+
           if (selectedBuildingList.includes(item)) {
             const updatedItems = selectedBuildingList.filter(itemVal => itemVal !== item);
             const data = tempRoom.filter((filterItem) => {
@@ -204,8 +211,11 @@ const RoomPreferenceScreen = ({
             if (data.length > 0) {
               setRoomDataFIlter(data);
             } else {
-              setRoomDataFIlter([]);
+
+              setRoomDataFIlter(tempRoom);
             }
+            const updatedSelectedItems = roomSelectedList.filter(itemVal => itemVal.buildingCode !== item);
+            setRoomSelctedList(updatedSelectedItems);
           }
           else {
             var temp = [...selectedBuildingList, item]
@@ -215,44 +225,11 @@ const RoomPreferenceScreen = ({
             if (data.length > 0) {
               setRoomDataFIlter(data);
             } else {
-              setRoomDataFIlter([]);
+
+              setRoomDataFIlter(tempRoom);
             }
             setSelectedBuildingList(temp)
           }
-          // setRoomDataFIlter(rooms);
-
-          // if (selectedBuildingList.includes(item)) {
-          //   const updatedItems = selectedBuildingList.filter(itemVal => itemVal !== item);
-          //   setSelectedBuildingList(updatedItems)
-          //   // let tempRoom = [...roomdataGlobal];
-          //   // const data = tempRoom.filter((filterItem) => {
-          //   //   return updatedItems.includes(filterItem.buildingCode ?? "")
-          //   // })
-          //   console.log("Ramesh");
-          //   console.log(updatedItems);
-
-          //   let tempRoom = [...roomdataGlobal];
-          //   // if (updatedItems.length == 0) {
-          //   //   tempRoom?.forEach((item) => {
-          //   //     let list = roomSelectedList?.filter((itemChild) => itemChild.facilityLocationId === item.facilityLocationId);
-          //   //     item.isSelected = list.length > 0 ? list[0].isSelected : false;
-          //   //   });
-          //   //   setRoomData(tempRoom)
-          //   // } else {
-          //   // const data = tempRoom.filter((filterItem) => {
-          //   //   return updatedItems.includes(filterItem.buildingCode ?? "")
-          //   // })
-          //   //   tempRoom?.forEach((item) => {
-          //   //     let list = roomSelectedList?.filter((itemChild) => itemChild.facilityLocationId === item.facilityLocationId);
-          //   //     item.isSelected = list.length > 0 ? list[0].isSelected : false;
-          //   //   });
-          //   //   setRoomData(data)
-          //   // }
-          // } else {
-          //   var temp = [...selectedBuildingList, item]
-          //   console.log("temp");
-
-          // }
 
         }}
         style={BottomSheetStyle.rowItemStyle}
@@ -288,24 +265,19 @@ const RoomPreferenceScreen = ({
   }
 
   const itemSelectionUpdate = (index: number) => {
-    console.log("itemSelectionUpdate[index] : ");
     setSelectedIndex(index);
     setDropDownOpened(false);
     setValueSpecies(speciesData[index]?.speciesName);
     getRoomLocations(speciesData[index]?.speciesId, data?.userInfo);
-    // const _data = _.cloneDeep(speciesData)
   };
 
-  // const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-  //     const currentScrollX = event.nativeEvent.contentOffset.x;
-  //     const direction = currentScrollX > lastScrollX ? 1 : 2;
-  //     console.log(`Scrolling ${direction}`);
-  //     setLastScrollX(direction);
-  // };
+
 
   const isAllRoomsSelected = () => {
-    // let rooms = roomdata.filter((item) => item.isSelected === true);
-    // console.log("TEST ==>>>", rooms.length)
+    if (selectedBuildingList.length == 0) {
+      return roomSelectedList.length == roomdataFIlter.length ? true : false;
+    }
+
     const updatedItems1 = roomSelectedList.filter(itemVal => selectedBuildingList.includes(itemVal.buildingCode ?? ""));
     const updatedItems2 = roomdataFIlter.filter(itemVal => selectedBuildingList.includes(itemVal.buildingCode ?? ""));
     return updatedItems1.length == updatedItems2.length ? true : false
@@ -334,11 +306,6 @@ const RoomPreferenceScreen = ({
               {t("more.current_mapp")}
             </Text>
 
-            {/* <ScrollView ref={scrollViewRef} scrollEventThrottle={16} onScroll={handleScroll} horizontal={true} style={{ flexDirection: 'row', marginBottom: 5, marginTop: 5, }}>
-                        {data?.userInfo?.response?.preferences?.locationPreferences.map((item) => <CustomChip textLableStyle={[CommonStyles.textStyleRegular, { fontSize: 14 }]} textLable={item.room} onClose={function (): void {
-                            console.log("Close");
-                        }} isEnableClose={false} backgroundColor={Colors.CHIP_COLOR} />)}
-                    </ScrollView> */}
             <View style={{ flexDirection: "row", marginBottom: 5 }}>
               <FlatList
                 data={
@@ -357,7 +324,6 @@ const RoomPreferenceScreen = ({
                         ]}
                         textLable={item.room}
                         onClose={function (): void {
-                          console.log("Close");
                         }}
                         isEnableClose={false}
                         backgroundColor={Colors.CHIP_COLOR}
@@ -383,11 +349,9 @@ const RoomPreferenceScreen = ({
                   setDropDownOpened(!isOpened);
                 }}
                 onSelectionCallback={(index) => {
-                  console.log("onSelectionCallback1");
                   itemSelectionUpdate(index);
                 }}
                 onSelectionAllCallback={() => {
-                  console.log("onSelectionAllCallback");
                 }}
               />
             </View>
@@ -426,9 +390,7 @@ const RoomPreferenceScreen = ({
                     );
                   }}
                 />
-
               </View>
-
             </View>
 
 
@@ -447,56 +409,39 @@ const RoomPreferenceScreen = ({
                 }}
                 onSelectionCallback={(index) => {
                   let list = roomSelectedList?.filter((itemChild) => itemChild.facilityLocationId === roomdataFIlter[index].facilityLocationId);
-                  console.log(list);
-
                   if (list.length == 0) {
                     var temp = [...roomSelectedList, roomdataFIlter[index]]
-                    console.log("list");
-
-                    console.log(temp);
-
                     setRoomSelctedList(temp);
                   } else {
-
                     const updatedItems = roomSelectedList.filter(itemVal => itemVal.facilityLocationId !== roomdataFIlter[index].facilityLocationId);
-                    console.log(updatedItems);
                     setRoomSelctedList(updatedItems);
                   }
-                  console.log("roomSelectedList");
-                  console.log(roomSelectedList);
-
-                  // const _data = _.cloneDeep(roomdata);
-                  // //console.log("_data[index] : ", index, _data);
-                  // _data[index].isSelected = !_data[index].isSelected;
-                  // setRoomData(_data);
                 }}
                 onSelectionAllCallback={() => {
-                  console.log("TEST onSelectionAllCallback");
-
-                  console.log("onSelectionAllCallback");
                   if (isAllRoomsSelected()) {
-                    const updatedItems = roomSelectedList.filter(itemVal => !selectedBuildingList.includes(itemVal.buildingCode ?? ""));
-                    // var temp = [...roomSelectedList];
-                    // temp = [...roomSelectedList, ...roomdataFIlter]
-                    // const ids = temp.map(({ facilityLocationId }) => facilityLocationId);
-                    // const filtered = temp.filter(({ facilityLocationId }, index) => !ids.includes(facilityLocationId, index + 1));
-
-
-                    setRoomSelctedList(updatedItems)
-
-                    //   temp?.forEach((item) => {
-                    //     item.isSelected = false;
-                    //   });
+                    if (selectedBuildingList.length == 0) {
+                      setRoomSelctedList([])
+                    } else {
+                      const updatedItems = roomSelectedList.filter(itemVal => !selectedBuildingList.includes(itemVal.buildingCode ?? ""));
+                      setRoomSelctedList(updatedItems)
+                    }
                   } else {
-                    var temp = [...roomSelectedList];
-                    temp = [...roomSelectedList, ...roomdataFIlter]
-                    const ids = temp.map(({ facilityLocationId }) => facilityLocationId);
-                    const filtered = temp.filter(({ facilityLocationId }, index) => !ids.includes(facilityLocationId, index + 1));
 
-                    setRoomSelctedList(filtered)
-                    //   temp?.forEach((item) => {
-                    //     item.isSelected = true;
-                    //   });
+                    if (selectedBuildingList.length == 0) {
+                      var temp1 = [...roomdataFIlter];
+
+                      setRoomSelctedList(temp1)
+
+                    } else {
+                      var temp = [...roomSelectedList];
+                      temp = [...roomSelectedList, ...roomdataFIlter]
+                      const ids = temp.map(({ facilityLocationId }) => facilityLocationId);
+                      const filtered = temp.filter(({ facilityLocationId }, index) => !ids.includes(facilityLocationId, index + 1));
+
+                      setRoomSelctedList(filtered)
+                    }
+
+
                   }
                 }}
 
@@ -551,7 +496,7 @@ const RoomPreferenceScreen = ({
                     [
                       {
                         text: "No",
-                        onPress: () => console.log("No Pressed"),
+                        onPress: () => { },
                         style: "cancel",
                       },
                       {
@@ -584,7 +529,7 @@ const RoomPreferenceScreen = ({
                       [
                         {
                           text: "No",
-                          onPress: () => console.log("No Pressed"),
+                          onPress: () => { },
                           style: "cancel",
                         },
                         {
@@ -635,6 +580,8 @@ const RoomPreferenceScreen = ({
         showToast(result?.response?.message, "success");
 
         //navigation.pop(); //as per feedback not navigating to previous scren
+        //roomSelectedList=[];
+        setRoomSelctedList([])
         loadData();
       } else if (result?.status?.httpStatus == 401) {
         Alert.alert(
@@ -651,10 +598,6 @@ const RoomPreferenceScreen = ({
           { cancelable: false }
         );
       } else {
-        // Utils.showToastMessage(
-        //   result?.response?.error[0]?.message ??
-        //   "The server was unable to process the request. Please try again after some time"
-        // );
         showToast(result?.response?.error[0]?.message ??
           "The server was unable to process the request. Please try again after some time", "info");
       }

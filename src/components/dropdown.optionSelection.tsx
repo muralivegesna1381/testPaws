@@ -73,7 +73,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
     {
       return (
         <Pressable onPress={() => {
-         // console.log("ITEM PRESED", props.result.scaleValue)
           props.result.isDefault = props.result.isDefault == 0 ? 1 : 0;
           //set_scaleSelectedValue(props.result.scaleValue);
           //callback trigger
@@ -105,7 +104,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
         firstList.push(props.actResult?.results[0]?.scaleResults[0]);
       }
       setUpdatedScaleList(firstList);
-      //console.log("SCLE ::::updatedList", firstList);
     }
   }
   const updateWeightUnits = () => {
@@ -124,8 +122,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
   }
 
   const getWeightUnits = (units: Unit[]) => {
-
-    // console.log("getWeightUnits", units);
     const unitsList: DropDownItmes[] = units?.map((unit) => {
       return {
         label: unit.unitName,
@@ -133,8 +129,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
         default: unit.default
       } as DropDownItmes
     });
-    //console.log("getWeightUnits=>", unitsList);
-
     return unitsList;
   }
   const handleChange = (result: any, index: number, actScaleTyle: ACT_SCALE_TYPES) => {
@@ -154,7 +148,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
 
     //Default value added for dropdown,
     let selectUnit = units.find(item => item.default == true)
-    //console.log("TEST 152link ;", selectUnit);
     if (selectUnit) {
       numericResults.unitName = selectUnit?.label;
       numericResults.unitId = Number(selectUnit?.value);
@@ -202,7 +195,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
               onChange={item => {
                 //setValue(item.value);
                 let name = units.find((it) => it.value === item.value);
-                //console.log("Dropdonw name 202=>>>", name, ";", item);
                 if (name) {
                   numericResults.unitName = name?.label;
                   numericResults.unitId = Number(name?.value);
@@ -234,26 +226,18 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
 
   const scaleListMainWidget = (scaleResults: ScaleResult[], actId: any) => {
     ///Need to show only manderoty scale first
-
-    //console.log('Inital updateScalList size ', scaleResults.length);
     return (
       <>
         {updateScalList.map((item, index) => scaleItem(item, index, actId))}
         {updateScalList.length < scaleResults.length ? <Pressable style={styles.buttonSelected}
-
           onPress={() => {
-           // console.log('Pressed updateScalList size ', updateScalList.length);
-
             let temp = [...updateScalList];
             if (temp.length <= scaleResults.length) {
               let obj = scaleResults[temp.length];
               obj.isAdded = true;
               temp.push(obj);
               setUpdatedScaleList(temp)
-            } else {
-              console.log("List end.......")
-            }
-
+            } 
           }}>
           <Text style={styles.textWhite}> + Add more</Text>
         </Pressable> : null}
@@ -292,7 +276,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
     />);
   }
   const scaleItem = (scaleResults: ScaleResult, index: number, actId: any) => {
-    //console.log("SCLE ::::", scaleResults);
     return (
       <SafeAreaView style={styles.container}>
         <Text style={styles.textBlack}>{scaleResults.resultName}</Text>
@@ -301,25 +284,18 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
           scaleResults.scaleList?.map((item, index1) => {
             return <ResultItem result={item} selectedId={scaleResults.scaleResultId}
               onCallback={function (scaleObj: ScaleList): void {
-                //console.log("Seleted Scaler", scaleObj);
-                //console.log("Seleted scaleResults", scaleResults);
                 scaleResults.scaleList.map((item) => {
-
                   if (item.scaleId === scaleObj.scaleId) {
                     item.isDefault = 1;
                   } else {
                     item.isDefault = 0;
                   }
                 });
-
-
                 //scaleResults.isDefault = props.result.isDefault == 0 ? 1 : 0;
-
                 scaleResults.resultValue = scaleObj.scaleId;
                 scaleResults.scaleResultId = scaleObj.scaleId;
                 //scaleResults.previousValue = scaleObj.scaleValue;
                 //TODO change the DVC value and remove the hardcode act value
-                //console.log("TEST :::", scaleResults);
                 if (actId == 57 || actId == 2032) {
                   if (scaleObj.scaleValue === "0")
                     scaleResults.dvc = "QNS";
@@ -330,7 +306,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
                 if (scaleResults)
                   scaleResults.selectedValue = scaleObj.scaleValue
                 set_scaleSelectedValue(scaleObj.scaleValue)
-                //console.log("RAjehs send this object item", index, "=", index1, scaleResults)
                 handleChange(scaleResults, index, ACT_SCALE_TYPES.SCALE);
               }} />;
           })
@@ -339,7 +314,6 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
           data={scaleResults.scaleList}
           renderItem={({ item }) => <ResultItem result={item} selectedId={scaleResults.scaleResultId}
             onCallback={function (scaleObj: ScaleList): void {
-              console.log("Seleted Scaler", scaleObj)
               // scaleResults.scaleResultId = scaleObj.scaleId;
               // scaleResults.resultValue = scaleObj.scaleId;
               // if (scaleResults)
@@ -417,14 +391,11 @@ const ACTScaleTypeComponent: React.FC<SelectionProps> = (props) => {
   const rederItem = (key: string) => {
 
     if (key === "scaleResults") {
-      //console.log("TEST render INSIDE=> scaleResults", actResultr?.results[0]?.scaleResults.length);
       return actResultr?.results[0]?.scaleResults.length > 0 ? scaleListMainWidget(actResultr?.results[0]?.scaleResults, actResultr?.actId) : null
     }
     else if (key === "binaryResults") {
-      //console.log("TEST render INSIDE=> binaryResults", actResultr?.results[0]?.binaryResults.length);
       return actResultr?.results[0]?.binaryResults?.map((result, index) => binaryWidget(result, index)) ?? null
     } else if (key === "numericResults") {
-      //console.log("TEST render INSIDE=> numericResults", actResultr?.results[0]?.numericResults.length);
       return actResultr?.results[0]?.numericResults?.map((result, index) => numericWidget(result, index, getWeightUnits(result.units))) ?? null
     } else if (key === "comments") {
 

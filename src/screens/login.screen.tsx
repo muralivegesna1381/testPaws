@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -20,16 +19,13 @@ import {
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
 import { useDispatch } from "react-redux";
-import fonts from "../fonts/fonts";
+import fonts, { fontFamily } from "../fonts/fonts";
 import { AuthStackParamList } from "../navigation/types";
 import { updateStack } from "../redux/slices/login.slicer";
 import CommonStyles from "../styles/commonstyles";
 import PawsLogo from "./../../assets/svgs/paws_logo.svg";
-
 import DeviceInfo from 'react-native-device-info';
 import InputText from "../components/input.text";
-
-
 import { useTranslation } from "react-i18next";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -43,7 +39,8 @@ import Utils from "./../utils";
 import * as firebaseHelper from "../utilities/firebase/firebaseHelper";
 import CheckBoxEmpty from "./../../assets/svgs/checkbox_empty.svg";
 import CheckBoxSelected from "./../../assets/svgs/checkbox_selected.svg";
-
+import { updateURL } from "../../App";
+import Colors from "../styles/color";
 type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, "Login">;
 
 /*
@@ -56,7 +53,6 @@ const LoginScreen = (props: LoginScreenProps) => {
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [isValidInputs, setIsValidInputs] = useState(false);
   const { navigation } = props;
   const [isHidePassword, set_isHidePassword] = useState(true);
   let hideImg = require("./../../assets/pngs/hide-password.png");
@@ -64,17 +60,14 @@ const LoginScreen = (props: LoginScreenProps) => {
   const scrollViewRef = useRef<ScrollView | null>(null);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [rememberMe, set_rememberMe] = useState(true);
-
-
-
   const [userEmail, setUserEmail] = useState("");
   const [user_Password, setPassword] = useState("");
+  const [isProduction, setIsSwitchOn] = React.useState(true);
   // const [userEmail, setUserEmail] = useState("rrallabandi@ctepl.com");
   // const [user_Password, setPassword] = useState("Password@03");
   const rnBiometrics = new ReactNativeBiometrics({
     allowDeviceCredentials: true,
   });
-  let pawsLogo = require("./../../assets/svgs/paws_logo.svg");
 
   useEffect(() => {
     firebaseHelper.reportScreen(firebaseHelper.Screen_Login);
@@ -84,7 +77,6 @@ const LoginScreen = (props: LoginScreenProps) => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }
     });
-
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       setKeyboardVisible(false);
     });
@@ -101,12 +93,9 @@ const LoginScreen = (props: LoginScreenProps) => {
     //   return;
     Keyboard.dismiss();
     if (userEmail && user_Password) {
-      //console.log("Condition okay");
       //Call login API
       //Navigates to dashaboard
-
       var reulst = doLogin();
-      //console.log("Condition Login ", reulst);
     } else {
       Alert.alert("Please provide Username and Password");
     }
@@ -121,13 +110,10 @@ const LoginScreen = (props: LoginScreenProps) => {
     try {
       firebaseHelper.logEvent(firebaseHelper.Event_Login_Button, firebaseHelper.Screen_Login, "");
       let loginRes = await NetworkManager.doLogin(data);
-      // console.log("TEST RES123::", JSON.stringify(loginRes));
-
       Utils.storeData(
         "rememberMe",
         rememberMe ? "Yes" : "No"
       );
-
       if (loginRes) {
         if (
           loginRes?.status?.success &&
@@ -135,7 +121,6 @@ const LoginScreen = (props: LoginScreenProps) => {
         ) {
           firebaseHelper.logEvent(firebaseHelper.Event_Login_Sucess, firebaseHelper.Screen_Login, "");
           let userResponse: UserResponse = loginRes?.response;
-          //console.log("LOGIN::::", userResponse);
           firebaseHelper.setUserId(userEmail.toLowerCase());
           firebaseHelper.setUserProperty(userEmail.toLowerCase());
           Utils.storeData("Token", loginRes?.response?.accessToken ?? "");
@@ -154,7 +139,6 @@ const LoginScreen = (props: LoginScreenProps) => {
             "Email",
             loginRes?.response?.userDetails?.email ?? ""
           );
-
           dispatch(saveUserData(loginRes));
           if (userResponse?.userDetails?.isLoggedIn == 0) {
             //Utils.showToastMessage("Required to change password");
@@ -182,7 +166,6 @@ const LoginScreen = (props: LoginScreenProps) => {
         }
       } else {
         firebaseHelper.logEvent(firebaseHelper.Event_Login_Fail, firebaseHelper.Screen_Login, "StatusCode: Network Error");
-
         console.error("Error Login: undifinde", loginRes);
         Alert.alert(t("loginscreen.netword_error"));
       }
@@ -203,9 +186,10 @@ const LoginScreen = (props: LoginScreenProps) => {
     var accessToken = await Utils.getData("Token");
     var userId = await Utils.getData("UserId");
     var prefernce = await Utils.getData("rememberMe") ?? "No";
+    var isInProduction = await Utils.getData("isProduction") ?? "Yes";
+    setIsSwitchOn(isInProduction === 'Yes' ? true : false)
     if (prefernce == "Yes") {
       var userName = await Utils.getData("UserName");
-
       setUserEmail(userName ?? '');
     }
     if (accessToken && isBiometricsEnabled === "true") {
@@ -213,24 +197,19 @@ const LoginScreen = (props: LoginScreenProps) => {
         .simplePrompt({ promptMessage: "Confirm fingerprint" })
         .then(async (resultObject) => {
           const { success } = resultObject;
-
           if (success) {
             // Biometrics authentication successful
-
             if (accessToken) {
               dispatch(updateStack({ stackName: "BottomBar" }));
-            } else {
-              console.log("ELSE CONDITIONS");
             }
-            console.log("successful biometrics provided");
           } else {
             // Biometrics authentication failed
-            console.log("user cancelled biometric prompt");
+            console.error("user cancelled biometric prompt");
           }
         })
         .catch(() => {
           //Biometrics authentication failed
-          console.log("biometrics failed");
+          console.error("biometrics failed");
         });
     }
     //login with token , with out asking password.
@@ -238,6 +217,15 @@ const LoginScreen = (props: LoginScreenProps) => {
       // Have token but biometric disabled.
       dispatch(updateStack({ stackName: "BottomBar" }));
     }
+  };
+  /**
+   * 
+   * @param value Toggle value
+   */
+  const onToggleSwitch = async (value: boolean) => {
+    setIsSwitchOn(value);
+    Utils.storeData("isProduction", value ? "Yes" : "No");
+    updateURL();
   };
 
   return (
@@ -249,23 +237,32 @@ const LoginScreen = (props: LoginScreenProps) => {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: hp('25%') }}
         onKeyboardWillShow={(frames: Object) => {
-          console.log('Keyboard event', frames)
+          console.warn('Keyboard event', frames)
         }}>
-
         <View
           style={{
             alignItems: "center",
             justifyContent: "center",
-            height: hp("35%"),
+            height: hp("37%"),
             paddingTop: insets.top
           }}
         >
           <PawsLogo style={styles.image} />
-
-
-
           <View style={{ justifyContent: "center", width: wp("80%") }}>
-            <Text style={styles.registerTextStyle}>{t("loginscreen.login")}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={styles.registerTextStyle}>{t("loginscreen.login")}</Text>
+              <View style={styles.actionsCellViewStyle}>
+                <View style={styles.radioContainerStyle}>
+                  <Pressable onPress={() => {
+                    onToggleSwitch(true);
+                  }} style={[isProduction ? styles.binaryButtonSelected : styles.binaryButton, styles.rightRadiosus]} ><Text style={isProduction ? styles.textBlack : styles.textGrey}>PROD</Text></Pressable>
+                  <Pressable onPress={(value) => {
+                    onToggleSwitch(false);
+                  }} style={[styles.leftRadiosus, !isProduction ? styles.binaryButtonSelected : styles.binaryButton]} ><Text style={!isProduction ? styles.textBlack : styles.textGrey}>TEST</Text></Pressable>
+                </View>
+              </View>
+            </View>
+
             <InputText
               value={userEmail}
               maxLength={50}
@@ -275,11 +272,10 @@ const LoginScreen = (props: LoginScreenProps) => {
                 setUserEmail(userEmail);
               }}
             />
-
             <View
               style={[
                 CommonStyles.textInputContainerStyle,
-                { alignSelf: "center", marginTop: hp("2%") },
+                { alignSelf: "center", marginTop: hp("1%") },
               ]}
             >
               <TextInput
@@ -296,7 +292,6 @@ const LoginScreen = (props: LoginScreenProps) => {
                   setPassword(userPswd);
                 }}
               />
-
               <TouchableOpacity
                 onPress={() => {
                   set_isHidePassword(!isHidePassword);
@@ -309,7 +304,6 @@ const LoginScreen = (props: LoginScreenProps) => {
               </TouchableOpacity>
             </View>
           </View>
-
           <View style={{ flexDirection: "row", marginTop: hp("0.5%"), width: wp("80%"), alignSelf: 'center', alignContent: 'flex-end', justifyContent: 'space-between' }}>
             <TouchableOpacity
               style={{
@@ -319,8 +313,6 @@ const LoginScreen = (props: LoginScreenProps) => {
                 alignItems: 'center',
                 alignSelf: 'flex-start',
                 marginLeft: hp("1%")
-
-
               }}
               onPress={() => {
                 if (rememberMe) {
@@ -329,7 +321,6 @@ const LoginScreen = (props: LoginScreenProps) => {
                 else {
                   set_rememberMe(true);
                 }
-
               }}
             >
               {rememberMe ? (
@@ -357,7 +348,6 @@ const LoginScreen = (props: LoginScreenProps) => {
                 {t("loginscreen.remeber_me")}
               </Text>
             </TouchableOpacity>
-
             {/* <TouchableOpacity
               style={{
                 height: hp("4%"),
@@ -375,7 +365,6 @@ const LoginScreen = (props: LoginScreenProps) => {
                 justifyContent: "center",
                 marginLeft: wp("5%"),
                 marginTop: hp("1.75%"),
-
               }}
               onPress={() => {
                 navigation.navigate("ResetPassword");
@@ -400,7 +389,6 @@ const LoginScreen = (props: LoginScreenProps) => {
           </View>
         </View>
       </KeyboardAwareScrollView>
-
       <Text style={styles.versionTextStyle}>
         Version: {DeviceInfo.getBuildNumber()}
       </Text>
@@ -422,7 +410,6 @@ const styles = StyleSheet.create({
     marginRight: wp("2.5%"),
     color: "#000",
   },
-
   versionTextStyle: {
     ...CommonStyles.textStyleRegular,
     fontSize: fonts.fontSmall,
@@ -430,8 +417,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     alignSelf: "center"
-
-
   },
   submitButton: {
     alignItems: "center",
@@ -443,7 +428,6 @@ const styles = StyleSheet.create({
     borderColor: "#FF6F0C",
     borderWidth: wp("0.2%"),
   },
-
   registerTextStyle: {
     ...CommonStyles.textStyleRegular,
     fontSize: fonts.fontNormal,
@@ -452,12 +436,61 @@ const styles = StyleSheet.create({
     //marginBottom: hp("1%"),
     marginLeft: wp("5%"),
   },
-
   image: {
     height: hp("20%"),
     width: wp("50%"),
     resizeMode: "contain",
     marginTop: hp("25%"),
+  },
+  actionsCellViewStyle: {
+    alignItems: "center",
+    flexDirection: "row",
+  },
+
+  leftRadiosus: {
+    borderTopEndRadius: 5,
+    borderBottomEndRadius: 5
+  },
+  rightRadiosus: {
+    borderTopStartRadius: 5,
+    borderBottomStartRadius: 5
+  },
+  binaryButton: {
+    backgroundColor: "#bbbbbb",
+    width: wp("15%"),
+    height: hp("4%"),
+    marginTop: hp("1%"),
+    justifyContent: "center",
+    alignItems: "center",
+
+  },
+  binaryButtonSelected: {
+    backgroundColor: Colors.APP_BLUE,
+    width: wp("15%"),
+    height: hp("4%"),
+    marginTop: hp("1%"),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  radioContainerStyle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: "center",
+  },
+  textBlack: {
+    fontSize: fonts.fontSmall,
+    fontFamily: fontFamily.bold,
+    color: Colors.WHITE,
+    marginBottom: hp("1%"),
+    marginTop: hp("1%")
+  },
+  textGrey: {
+    fontSize: fonts.fontSmall,
+    fontFamily: fontFamily.regular,
+    color: Colors.WHITE,
+    marginBottom: hp("1%"),
+    marginTop: hp("1%")
   },
 });
 

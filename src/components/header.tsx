@@ -14,8 +14,6 @@ type HeaderProps = {
 
 const Header = (props: HeaderProps) => {
   const { navigation, routeName } = props;
- // console.log('props : ', JSON.stringify(props));
-
   return (
     <View
       style={{

@@ -144,17 +144,14 @@ const BottomSheetComponent = forwardRef<BottomSheetModal, Props>(
     const [data, setData] = useState<DataItemType[]>([]);
     const [filteredData, setFilteredData] = useState<DataItemType[]>([]);
     const [totalCount, setTotalCount] = useState<number>(0);
-    //console.log("BottomSheetComponent : ", props.data);
     // const selectedItemsData: DataItemType[] = [];
     // const pushData = () => {
     // }
     // const popData = () => {
     // }
     useEffect(() => {
-      // console.log("TITLE--->", title, props.data);
       setData(props.data);
       let count = props.data.filter((item) => item.isSelected === true).length;
-      //console.log("Data count", count);
       setTotalCount(count);
     }, [props.data]);
 
@@ -215,7 +212,6 @@ const BottomSheetComponent = forwardRef<BottomSheetModal, Props>(
     }, [searchString]);
 
     const renderItemText = (item: DataItemType) => {
-      //console.log("RENDER ITEM", item, item.type);
       return (
         <Text style={BottomSheetStyle.itemTextStyle}>
           {item.type === "ACT"
@@ -303,7 +299,6 @@ const BottomSheetComponent = forwardRef<BottomSheetModal, Props>(
      */
     function getSelectionCount() {
       let count = data.filter((item) => item.isSelected === true).length;
-     // console.log("Get count.....", count);
       setTotalCount(count);
     }
     const renderBackdrop = useCallback(
@@ -325,7 +320,6 @@ const BottomSheetComponent = forwardRef<BottomSheetModal, Props>(
       try {
         let testRes = await NetworkManager.getLookUpTestNames(searchvalue);
         if (testRes?.status?.success) {
-          //console.log('TEST FILTER RESPONSE-->', testRes?.response)
           const newData: TestFilterType[] = testRes?.response.map(
             (obj: TestFilterType) => {
               return { ...obj, isSelected: false, type: "TEST" };
@@ -334,23 +328,17 @@ const BottomSheetComponent = forwardRef<BottomSheetModal, Props>(
 
           let oldData = [...data];
           oldData = [...data, ...newData]
-         // console.log('newData-->', newData)
-
           const uniqueArray = oldData.filter(
             (obj, index, self) =>
               index === self.findIndex((t) => t.testId === obj.testId)
           );
-          //console.log('uniqueArray-->', uniqueArray)
           // oldData.forEach((oldEleent) => {
           //   newData.every((itesm) => {
-
           //     if (itesm.testId === oldEleent.testId) {
           //       itesm.isSelected = oldEleent.isSelected;
           //     }
           //     else {
           //       if (oldEleent.isSelected && (itesm.testId != oldEleent.testId))
-          //         console.log("OLD ELEM==>", oldEleent);
-          //       console.log("TEST ITEM", itesm);
           //       newData.push(oldEleent)
           //     }
           //   });
@@ -455,7 +443,6 @@ const BottomSheetComponent = forwardRef<BottomSheetModal, Props>(
                 if (val.length > 3) {
                   //call service from here
                   //implement new service here on string change do a service call here and update the list data
-                  console.log('search string filter goes here');
                   getTestFilters(val);
                 }
                 else if (val.length === 0) {

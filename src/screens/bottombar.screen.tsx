@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Home from "../navigation/home";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BottombarStackParamList } from "../navigation/types";
 import AnimalsStack from "../navigation/animals.stack";
@@ -28,13 +27,9 @@ type TabbarScreenProps = NativeStackScreenProps<
 >;
 
 const Tab = createBottomTabNavigator();
-
 const BottombarScreen = ({ navigation }: TabbarScreenProps) => {
-  // console.log("Tabbar screen : ", navigation);
-
   const getTabBarImage = (routeName: string, focused: boolean) => {
     var icon;
-
     if (routeName === "Animals") {
       icon = focused ? <PawIconSelected /> : <PawIcon />;
     } else if (routeName === "Loadbowls") {
@@ -47,8 +42,6 @@ const BottombarScreen = ({ navigation }: TabbarScreenProps) => {
     return icon;
   };
   const getTabBarVisibility = (route: any) => {
-    // console.log("route", route);
-
     const routeName = getFocusedRouteNameFromRoute(route) ?? "";
     const hideOnScreens = [
       "LoadBowlDetailsScreen",
@@ -61,8 +54,6 @@ const BottombarScreen = ({ navigation }: TabbarScreenProps) => {
       "Tasks",
       "DVCHelp"
     ]; // put here name of screen where you want to hide tabBar
-    //console.log("hideOnScreens", hideOnScreens);
-    //console.log("routeName", routeName);
     return hideOnScreens.indexOf(routeName) <= -1;
   };
   return (
@@ -90,12 +81,6 @@ const BottombarScreen = ({ navigation }: TabbarScreenProps) => {
       />
       <Tab.Screen
         name="Animals"
-        // listeners={{
-        //   tabPress: e => {
-        //     // Prevent default action for customer build by Vinay on 6th September
-        //     e.preventDefault();
-        //   },
-        // }}
         component={AnimalsStack}
         options={({ route }) => ({
           tabBarVisible: getTabBarVisibility(route),
@@ -145,8 +130,9 @@ const styles = StyleSheet.create({
   },
   imageStyle: {
     marginTop: hp("3%"),
-    margin: 3,
-    padding: 5,
+    //marginBottom: 6,
+    marginVertical: 7,
+    padding: 8,
   },
   cardShadow: {
     borderRadius: 16,

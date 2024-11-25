@@ -9,7 +9,6 @@ import {
 import { useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../navigation/types";
-import { useDispatch } from "react-redux";
 import CommonStyles from "../styles/commonstyles";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -25,7 +24,6 @@ import { useTranslation } from "react-i18next";
 import Utils from "./../utils";
 import _ from "lodash";
 import LoadingModal from "../components/loadingModel";
-import PawsLogo from "../../assets/svgs/paws_logo.svg"
 import HeaderComponent from "../components/headerComponent";
 import Colors from "../styles/color";
 import { showToast } from "../components/custom.toast.message";
@@ -37,14 +35,12 @@ User will be authenticated via Email Id that they are entering once, the authent
 then then User will be sent a temp password to their email
 */
 const ResetPassword = (props: ResetPasswordProps) => {
-    const { t } = useTranslation();
     const insets = useSafeAreaInsets();
     const [loading, setLoading] = useState(false);
     const { navigation } = props;
     const [userEmail, setUserEmail] = useState("");
     const onPress = async () => {
         if (Utils.isValidEmail(userEmail)) {
-
             Alert.alert(
                 "Are you sure you would like to Submit?",
                 "",
@@ -65,13 +61,10 @@ const ResetPassword = (props: ResetPasswordProps) => {
                 ],
                 { cancelable: false }
             );
-
         } else {
-
             Alert.alert("Please provide a valid Email ID");
         }
     };
-
     async function _resetRequest() {
         try {
             setLoading(true)
@@ -83,7 +76,6 @@ const ResetPassword = (props: ResetPasswordProps) => {
             } else {
                 // Utils.showToastMessage(result?.errors[0]?.message);
                 Alert.alert(result?.errors[0]?.message ?? 'Invalid');
-                //console.log("Reset password :" + JSON.stringify(result))
             }
         } catch (e) {
             console.error(e)
@@ -119,7 +111,6 @@ const ResetPassword = (props: ResetPasswordProps) => {
                             }}
                         />
                     </View>
-
                     <View
                         style={{
                             flexDirection: "row",

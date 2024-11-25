@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { Monitor } from "../../model/monitorCount_model";
 const montorCountSlicer = createSlice({
   name: "MonitorCount",
-  initialState: [],
+  initialState: {},
   reducers: {
     ///Monitor count information
     saveMonitorCount(state, action) {

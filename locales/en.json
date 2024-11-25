@@ -8,7 +8,9 @@
     "submit": "Submit",
     "forgotpassword": "Reset Password",
     "netword_error": "Please check your network connection.",
-    "remeber_me": "Remember Me"
+    "remeber_me": "Remember Me",
+    "prod": "PROD",
+    "uat": "UAT"
   },
   "more": {
     "room_title": "Room/User Monitor",

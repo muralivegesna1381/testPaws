@@ -45,8 +45,6 @@ const ModalComponent = (props: ModalProps) => {
     isTransparentBGRequired = true,
   } = props;
 
-  // console.log("props : ", props);
-
   return (
     <View style={ModelStyle.centeredView}>
       <Modal

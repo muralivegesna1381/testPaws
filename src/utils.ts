@@ -16,7 +16,6 @@ import NetInfo from "@react-native-community/netinfo";
 import { showToast } from "./components/custom.toast.message";
 export default class Utils {
   static storeData = async (key: string, value: string) => {
-    //console.log(key, value);
     try {
       await AsyncStorage.setItem(key, value);
     } catch (e) {
@@ -24,7 +23,6 @@ export default class Utils {
     }
   };
   static clearUserData = async () => {
-   // console.log("clearUserData");
     try {
       this.storeData("Token", "");
       this.storeData("UserId", "");
@@ -69,7 +67,6 @@ export default class Utils {
       var dateMomentObject = moment(dateString, inFormat);
       var dateObject = dateMomentObject.toDate();
       const newDate: string = moment(dateObject).format(toFormat);
-      //console.log("newDate", newDate);
       return newDate;
     } catch (e) {
       console.error(e);
@@ -81,7 +78,8 @@ export default class Utils {
     return re.test(pass);
   }
   static isValidEmail(email: string) {
-    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+    let reg =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return reg.test(email);
   }
   /**
@@ -185,8 +183,6 @@ export default class Utils {
         if (state.isConnected) {
           //TODO need write API thread
           for (let i = 0; i < reocedInfo?.length; i++) {
-           // console.log("Reocd information ===." + reocedInfo[i]._id);
-
             let req: RecordGrpuActRequst = reocedInfo[i].request_body;
             let result = await NetworkManager.saveGroupActResults(req, true);
             if (
@@ -198,22 +194,14 @@ export default class Utils {
                 db,
                 reocedInfo[i]._id
               );
-              //console.log("DELETED ===>", delteRec);
             }
-           // console.log("RECODS COUNT result=>", result);
             if (result != undefined) {
               showToast("Offline records sync successfully!", "success");
               //this.showToastMessage("Offline records sync successfully!");
             }
-            // console.log(
-            //   "RECODS COUNT DONE=>",
-            //   reocedInfo[i].act_count,
-            //   "=>",
-            //   reocedInfo[i].act_id
-            // );
           }
         } else {
-          //console.log("No internet connection");
+          console.error("No internet connection");
         }
       } catch (e) {
         console.error(e);

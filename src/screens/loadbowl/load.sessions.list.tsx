@@ -113,7 +113,7 @@ const LoadBowlSessionScreen = (props: loadBowlSessionScreenProps) => {
         }
         try {
             set_isLoading(true);
-            firebaseHelper.logEvent(firebaseHelper.Event_Update_Session_ListPage, firebaseHelper.Screen_Loadbowl_SessionList, "");     
+            firebaseHelper.logEvent(firebaseHelper.Event_Update_Session_ListPage, firebaseHelper.Screen_Loadbowl_SessionList, "");
 
             if (sessionObject.SESSION_STATUS_ID == "I") {
                 let bowlSessionRes = await LoadBowlAPIManager.getSessionBowlsLoaded(sessionObject.FEEDING_SESSION_ID);
@@ -167,10 +167,11 @@ const LoadBowlSessionScreen = (props: loadBowlSessionScreenProps) => {
                 <View style={{ flexDirection: 'row', alignContent: 'space-between', paddingLeft: 10, paddingRight: 10, paddingBottom: 15, paddingTop: 15, alignItems: 'center' }}>
                     <View style={{ flexDirection: 'column', alignContent: 'space-between', flex: 1, }}>
 
-                        <TouchableOpacity onPress={() => { 
-                            firebaseHelper.logEvent(firebaseHelper.Event_Loadbowl_Button_SessionDetail, firebaseHelper.Screen_Loadbowl_SessionList, "");     
+                        <TouchableOpacity onPress={() => {
+                            firebaseHelper.logEvent(firebaseHelper.Event_Loadbowl_Button_SessionDetail, firebaseHelper.Screen_Loadbowl_SessionList, "");
 
-                            navigation.navigate('LoadBowlSessionDetails', { 'sessionObject': sessionObject }); }}>
+                            navigation.navigate('LoadBowlSessionDetails', { 'sessionObject': sessionObject });
+                        }}>
                             <Text style={{
                                 fontSize: 16, fontWeight: '700',
                                 color: '#000000',

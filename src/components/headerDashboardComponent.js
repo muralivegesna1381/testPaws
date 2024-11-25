@@ -77,14 +77,10 @@ const HeaderComponent = ({
 
       if (count?.length > 0 && internet?.isInternetReachable) {
         Utils.synchACTData(userID ?? "0");
-      } else {
-        //console.log("==SYNCH==", count?.length);
-      }
+      } 
     });
   }
-  //console.log("module name", moduleName, notificationsAvailable);
   const editAction = () => {
-
     firebaseHelper.logEvent(firebaseHelper.Event_Notes, firebaseHelper.Screen_Dashboard_Grid, "");
     navigation.navigate("NotesScreen");
   };

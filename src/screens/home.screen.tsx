@@ -7,30 +7,24 @@ import { Todo_Item, deleteTodo, todoAdded, todoToggled, updateTodo } from '../re
 import { Root_State } from '../redux/store';
 import { customAlphabet } from 'nanoid/non-secure';
 import {useTranslation} from 'react-i18next';
+import { t } from 'i18next';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, 'Dashboard'>;
-
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
-
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
-
   const {t} = useTranslation();
   const [inputText, setInputText] = useState('');
   const [selectedTodo, setSelectedTodo] = useState<Todo_Item | undefined>(
     undefined,
   );
   const dispatch = useDispatch();
-  
-
   const todosList = useSelector((state: Root_State) => {
     let todos: Todo_Item[] = state.todos;
     return todos;
   });
-
   const didChangeText = (text: string) => {
     setInputText(text);
   };
-
   const didPressAddButton = () => {
     if (selectedTodo) {
       dispatch(updateTodo({ id: selectedTodo.id, title: inputText }));
@@ -40,22 +34,18 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     setInputText('');
     setSelectedTodo(undefined);
   };
-
   const didPressTodoItem = (todo: Todo_Item) => {
     setSelectedTodo(todo);
     setInputText(todo.text);
     //navigation.navigate("Dashboard");
   };
-
   const didUpdteTodoItem = (todo: Todo_Item) => {
     setSelectedTodo(todo);
     setInputText(todo.text);
   };
-
   const completeTodo = (todo: Todo_Item) => {
     dispatch(todoToggled({ id: todo.id }));
   };
-
   const deleteTodoItem = (todo: Todo_Item) => {
     dispatch(deleteTodo({ id: todo.id }));
   };
@@ -102,7 +92,6 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           </Text>
         </Pressable>
       </View>
-
       <FlatList
         style={{ margin: 10 }}
         data={todosList}
@@ -179,7 +168,6 @@ const TodoItem = (props: TodoItemProps) => {
         }}>
         <Text style={{ color: 'white' }}> {t('homescreen.update')} </Text>
       </TouchableOpacity>
-
       <TouchableOpacity
         style={{
           backgroundColor: 'red',

@@ -5,7 +5,6 @@ export const getRequest = async (urlPath: string) => {
     const res = axios
         .get(urlPath)
         .then(function (response) {
-           // console.log("Response ---> ", response.data);
             return response.data;
         })
         .catch(function (error) {
@@ -25,7 +24,6 @@ export const getRequestWithHeaders = async (urlPath: string) => {
             },
         })
         .then(function (response) {
-           // console.log("Response ---> ", response.data);
             return response?.data;
         })
         .catch(function (error) {

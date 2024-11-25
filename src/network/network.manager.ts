@@ -1,4 +1,4 @@
-import axios, { AxiosHeaderValue } from "axios";
+import axios from "axios";
 import Utils from "../utils";
 import { Alert } from "react-native";
 import ModalComponent from "../components/modal.component";
@@ -8,8 +8,8 @@ import { Species } from "../model/species_model";
 import { ActResultRequest } from "../model/act_result_request";
 import { DVCListResponse } from "../model/dvc_model";
 import { RecordGrpuActRequst } from "../model/act_save_object_model";
-import { BASE_URL } from "./api.constants";
-import { fetch } from "@react-native-community/netinfo";
+import { BASE_URL, BASE_URL_LOAD_BOWL } from "../../App";
+
 import {
   createRecodTable,
   deleteRecordByRecordId,
@@ -30,8 +30,8 @@ const GET_MONITOR_COUNT = "/dashboard/monitor-counts";
 const GET_ROOMS_USERS = "/lookup/room-user-monitor";
 const GET_DASHBOARD_PENDING_TASK_COUNT = "/dashboard/pending-tasks-count";
 //const BASE_URL_BOWL_DETAILS = "http://172.16.0.42:83/SessionDetails.asmx/";
-const BASE_URL_BOWL_DETAILS =
-  "http://10.202.10.63/PawsDigitalService/PawsDigital.asmx/";
+// const BASE_URL_BOWL_DETAILS =
+//   "http://10.202.10.63/PawsDigitalService/PawsDigital.asmx/";
 const GetCageFeederDetails = "GetCageFeederDetails?scanBowlID=";
 const GetSessionBowlsLoaded = "GetSessionBowlsLoaded?feedingSession=";
 const updateSessionStatusURL = "UpdateSessionStatus?Json=";
@@ -53,7 +53,7 @@ const LOOKUP_ALL_LOCATION = "/lookup/allLocations";
 const LOOKUP_SPECIES = "/lookup/species";
 const USER_PREFERENCE = "/users/preferences";
 const LOOKUP_ANIMALS_BY_NAME = "/lookup/animals";
-const LOOKUP_LOCATIONS_BY_NAME = "/lookup/locations";
+//const LOOKUP_LOCATIONS_BY_NAME = "/lookup/locations";
 const LOOKUP_DVC = "/lookup/dvc";
 const LOOKUP_USERS = "/lookup/users";
 const ACTS = "/act";
@@ -74,7 +74,6 @@ const EXPORT_AUDIT_DETAILS = "/audit/export-audit-logs/";
 const ANIMAL_IMAGE = "/image/animal-image";
 export const ANIMAL_IMAGE_LINK = "/files/thumbnail-image/";
 // const doUserLogin = async (urlPath: string, data: any) => {
-//   console.log("DAT", data, urlPath);
 //   const result = await fetch(urlPath, {
 //     method: "POST",
 //     headers: {
@@ -84,7 +83,6 @@ export const ANIMAL_IMAGE_LINK = "/files/thumbnail-image/";
 //     body: JSON.stringify(data),
 //   });
 //   const jsonResponse = await result.json();
-//   console.log("TEST", jsonResponse);
 //   return result;
 // };
 
@@ -92,7 +90,6 @@ const doLoginUser = async (urlPath: string, data: string) => {
   const res = axios
     .post(urlPath, data)
     .then(function (response) {
-      // console.log("API", response.data.response?.accessToken);
       return response.data;
     })
     .catch(function (error) {
@@ -135,7 +132,6 @@ const notPerformedACT = async (
       }
     )
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -169,7 +165,6 @@ const deleteACT = async (
       }
     )
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -206,7 +201,6 @@ const completedACT = async (
       },
     })
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -242,7 +236,6 @@ const markAsFailedACT = async (
       }
     )
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -280,7 +273,6 @@ const markAsRescheduleACT = async (
       }
     )
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -338,7 +330,6 @@ const notificationDelete = async (
       },
     })
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -364,7 +355,6 @@ const getDashboardMonitorCounts = async (
       },
     })
     .then(function (response) {
-
       return response.data;
     })
     .catch(function (error) {
@@ -376,7 +366,6 @@ const getDashboardMonitorCounts = async (
 const getDashboardPendingTasksCount = async (urlPath: string, data: string) => {
   var userId = await Utils.getData("UserId");
 
-
   var accessToken = await Utils.getData("Token");
   urlPath = urlPath + "/" + userId;
   const res = axios
@@ -387,7 +376,6 @@ const getDashboardPendingTasksCount = async (urlPath: string, data: string) => {
       },
     })
     .then(function (response) {
-
       return response.data;
     })
     .catch(function (error) {
@@ -398,11 +386,9 @@ const getDashboardPendingTasksCount = async (urlPath: string, data: string) => {
 };
 
 const getBowlDetails = async (urlPath: string) => {
-
   const res = axios
     .get(urlPath)
     .then(function (response) {
-
       return response.data;
     })
     .catch(function (error) {
@@ -413,7 +399,6 @@ const getBowlDetails = async (urlPath: string) => {
 };
 
 const getSessionBowlsLoaded = async (urlPath: string) => {
-
   const res = axios
     .get(urlPath)
     .then(function (response) {
@@ -429,7 +414,6 @@ const updateSessionStatus = async (urlPath: string) => {
   const res = axios
     .get(urlPath)
     .then(function (response) {
-      // console.log("API", response.data.response?.accessToken);
       return response.data;
     })
     .catch(function (error) {
@@ -464,7 +448,6 @@ const getRoomAndUserData = async (
       },
     })
     .then(function (response) {
-      //console.log("API", response.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -487,7 +470,7 @@ const getPendingACTList = async (
   test: any,
   sortBy: any,
   order: any,
-  status:any
+  status: any
 ) => {
   var accessToken = await Utils.getData("Token");
 
@@ -517,8 +500,6 @@ const getPendingACTList = async (
     order +
     "&typeId=" +
     status;
-
-  console.log("REQ URL",requestUrl);
   const res = axios
     .get(requestUrl, {
       headers: {
@@ -547,7 +528,8 @@ const getFMTTasks = async (
   fromDate: string,
   toDate: string,
   fmtName: string,
-  location: any
+  location: any,
+  status: string
 ) => {
   var accessToken = await Utils.getData("Token");
   let requestUrl =
@@ -571,7 +553,9 @@ const getFMTTasks = async (
     "&fmtName=" +
     fmtName +
     "&facilityLocation=" +
-    location;
+    location +
+    "&typeId=" +
+    status;
   const res = axios
     .get(requestUrl, {
       headers: {
@@ -580,7 +564,6 @@ const getFMTTasks = async (
       },
     })
     .then(function (response) {
-      // console.log("API FMT", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -641,7 +624,6 @@ const getPendingCollections = async (
       },
     })
     .then(function (response) {
-      // console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -652,8 +634,9 @@ const getPendingCollections = async (
 };
 
 const getLookUpACTNames = async (urlPath: string, data: any) => {
+  var userId = await Utils.getData("UserId");
   if (data) {
-    urlPath = urlPath + "?flow=" + data;
+    urlPath = urlPath + "?flow=" + data + "&userId=" + userId;
   }
   var accessToken = await Utils.getData("Token");
   const res = axios
@@ -664,7 +647,6 @@ const getLookUpACTNames = async (urlPath: string, data: any) => {
       },
     })
     .then(function (response) {
-      // console.log("getLookUpACTNames API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -689,6 +671,7 @@ const getLookUpLocationNames = async (
     "&flow=" +
     apiParam;
 
+  console.log("TEST get getLookUpLocationNames 693=>", url);
   const res = axios
     .get(url, {
       headers: {
@@ -697,7 +680,6 @@ const getLookUpLocationNames = async (
       },
     })
     .then(function (response) {
-      //console.log("getLookUpLocationNames API", response.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -717,7 +699,6 @@ const getLookUpSampleTypes = async (urlPath: string) => {
       },
     })
     .then(function (response) {
-      // console.log("getLookUpSampleTypes API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -737,7 +718,6 @@ const getLookUpFMTNames = async (urlPath: string) => {
       },
     })
     .then(function (response) {
-      // console.log("getLookUpFMTNames API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -758,7 +738,6 @@ const getLookUpTestNames = async (urlPath: string, data: any) => {
       },
     })
     .then(function (response) {
-      // console.log("getLookUpTestNames API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -769,11 +748,9 @@ const getLookUpTestNames = async (urlPath: string, data: any) => {
 };
 
 const getfeedingAnimalSessions = async (urlPath: string) => {
-
   const res = axios
     .get(urlPath)
     .then(function (response) {
-      //console.log("getBowlDetails API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -787,7 +764,6 @@ const setLoadBowlDetails = async (urlPath: string) => {
   const res = axios
     .get(urlPath)
     .then(function (response) {
-      // console.log("API", response.data.response?.accessToken);
       return response.data;
     })
     .catch(function (error) {
@@ -831,7 +807,6 @@ const getUserInfo = async (
       },
     })
     .then(function (response) {
-      //console.log("API doUserLogout:", response.data.response);
       return response?.data;
     })
     .catch(function (error) {
@@ -876,7 +851,6 @@ const getSpecies = async (urlPath: string): Promise<Species> => {
       },
     })
     .then(function (response) {
-      //console.log("API doUserLogout:", response.data.response);
       return response?.data;
     })
     .catch(function (error) {
@@ -901,7 +875,6 @@ const getRoomsListBySpecies = async (
       },
     })
     .then(function (response) {
-      // console.log("API get ALLL LOCTION:=>:", JSON.stringify(response?.data));
       return response?.data;
     })
     .catch(function (error) {
@@ -923,7 +896,6 @@ const getActs = async (urlPath: string, type: number, Id: String) => {
       },
     })
     .then(function (response) {
-      //console.log("API", response.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -963,7 +935,6 @@ const getScheduledAnimals = async (
       },
     })
     .then(function (response) {
-      //console.log("API", response?.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -975,7 +946,6 @@ const getScheduledAnimals = async (
 
 const getACTResults = async (urlPath: string, request: ActResultRequest) => {
   var accessToken = await Utils.getData("Token");
-  // console.log("getACTResults Request:", urlPath, request);
   const res = axios
     .post(urlPath, request, {
       headers: {
@@ -985,7 +955,6 @@ const getACTResults = async (urlPath: string, request: ActResultRequest) => {
       },
     })
     .then(function (response) {
-      //console.log("getACTResults_API", response?.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -1029,7 +998,6 @@ const getAnimalsByName = async (
       },
     })
     .then(function (response) {
-      //console.log("API", response.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -1069,6 +1037,7 @@ const getLocationsByName = async (
   // if (query.length > 0) {
   //   requestUrl = requestUrl + "&query=" + query
   // }
+  console.log("TEST location req 1072:=>", requestUrl);
   const res = axios
     .get(requestUrl, {
       headers: {
@@ -1078,7 +1047,6 @@ const getLocationsByName = async (
       },
     })
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -1091,7 +1059,6 @@ const getLocationsByName = async (
 const getDVCs = async (urlPath: string) => {
   var accessToken = await Utils.getData("Token");
   //TODO need to update user ID from SP
- // console.log("URL", urlPath);
   const res = axios
     .get(urlPath, {
       headers: {
@@ -1100,7 +1067,6 @@ const getDVCs = async (urlPath: string) => {
       },
     })
     .then(function (response) {
-      // console.log("API doUserLogout:", response?.data?.response);
       return response?.data;
     })
     .catch(function (error) {
@@ -1114,7 +1080,6 @@ const getLookUpUsers = async (urlPath: string) => {
   var accessToken = await Utils.getData("Token");
   // var userId = await Utils.getData("UserId");
   let url = urlPath + "/" + 2;
- // console.log("URL------>", url);
   const res = axios
     .get(url, {
       headers: {
@@ -1144,7 +1109,6 @@ const doPasswordChange = async (
       },
     })
     .then(function (response) {
-      //console.log("API doPasswordChange:", response.data.response);
       return response?.data;
     })
     .catch(function (error) {
@@ -1160,7 +1124,6 @@ const doPasswordReset = async (
 ): Promise<any> => {
   urlPath = urlPath + "/" + userName;
   let newURl = new URLSearchParams({ url: urlPath });
-  //console.log("URL", newURl);
   const res = axios
     .put(urlPath, null, {
       headers: {
@@ -1168,7 +1131,6 @@ const doPasswordReset = async (
       },
     })
     .then(function (response) {
-      //console.log("API doPasswordChange:", response?.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -1180,7 +1142,6 @@ const doPasswordReset = async (
 const actMarkAsReadPut = async (urlPath: string) => {
   var accessToken = await Utils.getData("Token");
   //TODO need to update user ID from SP
-  //console.log("URL", urlPath);
   const res = axios
     .get(urlPath, {
       headers: {
@@ -1189,11 +1150,9 @@ const actMarkAsReadPut = async (urlPath: string) => {
       },
     })
     .then(function (response) {
-      //console.log("API doUserLogout:", response.data.response);
       return response?.data;
     })
     .catch(function (error) {
-      // console.error("ERROR doUserLogout : ", error.response.data);
       return error.response?.data;
     });
   return res;
@@ -1202,7 +1161,6 @@ const actMarkAsReadPut = async (urlPath: string) => {
 const actListDetails = async (urlPath: string) => {
   var accessToken = await Utils.getData("Token");
   //TODO need to update user ID from SP
- // console.log("URL", urlPath);
   const res = axios
     .get(urlPath, {
       headers: {
@@ -1211,7 +1169,6 @@ const actListDetails = async (urlPath: string) => {
       },
     })
     .then(function (response) {
-      //console.log("API doUserLogout:", response.data.response);
       return response?.data;
     })
     .catch(function (error) {
@@ -1232,7 +1189,6 @@ const saveGroupActResults = async (
   requestBody: RecordGrpuActRequst
 ) => {
   var accessToken = await Utils.getData("Token");
-  console.log("saveGroupActResults:", urlPath, requestBody);
   const res = axios
     .post(urlPath, requestBody, {
       headers: {
@@ -1242,7 +1198,6 @@ const saveGroupActResults = async (
       },
     })
     .then(function (response) {
-      //console.log("getACTResults_API", response?.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -1253,7 +1208,6 @@ const saveGroupActResults = async (
 };
 
 const getAuditEntityTypes = async (urlPath: string) => {
-  //console.log("TEST Audit Entity Types MAIN", urlPath);
   var accessToken = await Utils.getData("Token");
   const res = axios
     .get(urlPath, {
@@ -1263,7 +1217,6 @@ const getAuditEntityTypes = async (urlPath: string) => {
       },
     })
     .then(function (response) {
-      // console.log("getLookUpFMTNames API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -1283,7 +1236,6 @@ const getAuditEntity = async (urlPath: string) => {
       },
     })
     .then(function (response) {
-      // console.log("getLookUpFMTNames API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -1294,7 +1246,6 @@ const getAuditEntity = async (urlPath: string) => {
 };
 
 // const getLookUpUsers = async (urlPath: string) => {
-//   console.log("TEST Audit Entity MAIN", urlPath);
 //   var accessToken = await Utils.getData("Token");
 //   const res = axios
 //     .get(urlPath, {
@@ -1304,7 +1255,6 @@ const getAuditEntity = async (urlPath: string) => {
 //       },
 //     })
 //     .then(function (response) {
-//       // console.log("getLookUpFMTNames API", response.data);
 //       return response.data;
 //     })
 //     .catch(function (error) {
@@ -1365,7 +1315,6 @@ const getAuditDetailsList = async (
       },
     })
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -1426,7 +1375,6 @@ const exportAuditDetails = async (
       },
     })
     .then(function (response) {
-      //console.log("API", response.data);
       return response.data;
     })
     .catch(function (error) {
@@ -1447,7 +1395,6 @@ const getAnimalImage = async (urlPath: string, animalId: number) => {
       },
     })
     .then(function (response) {
-      // console.log("getAnimalImage API", response?.data);
       return response?.data;
     })
     .catch(function (error) {
@@ -1459,6 +1406,7 @@ const getAnimalImage = async (urlPath: string, animalId: number) => {
 
 const NetworkManager = {
   doLogin: async (data: any) => {
+    //console.log("TEST base url", BASE_URL);
     let result = await doLoginUser(BASE_URL + LOGIN, data);
     return result;
   },
@@ -1487,7 +1435,7 @@ const NetworkManager = {
     test: any,
     sortBy: any,
     order: any,
-    status:any
+    status: any
   ) => {
     let result = await getPendingACTList(
       BASE_URL + GET_PENDING_ACT_LIST,
@@ -1516,7 +1464,8 @@ const NetworkManager = {
     fromDate: any,
     toDate: any,
     fmtName: any,
-    location: any
+    location: any,
+    status: string
   ) => {
     let result = await getFMTTasks(
       BASE_URL + GET_FMT_COUNT,
@@ -1529,7 +1478,8 @@ const NetworkManager = {
       fromDate,
       toDate,
       fmtName,
-      location
+      location,
+      status
     );
     return result;
   },
@@ -1556,7 +1506,7 @@ const NetworkManager = {
     );
     return result;
   },
-  deleteNotification: async (userId: string, notificationId: number) => {
+  deleteNotification: async (userId: string, notificationId: any) => {
     let result = await notificationDelete(
       BASE_URL + NOTIFICATIONS,
       userId,
@@ -1589,7 +1539,7 @@ const NetworkManager = {
   },
   getBowlDetails: async (data: any) => {
     let result = await getBowlDetails(
-      BASE_URL_BOWL_DETAILS + GetCageFeederDetails + data
+      BASE_URL_LOAD_BOWL + GetCageFeederDetails + data
     );
     return result;
   },
@@ -1672,35 +1622,35 @@ const NetworkManager = {
 
   updateSessionStatus: async (data: any) => {
     let result = await updateSessionStatus(
-      BASE_URL_BOWL_DETAILS + updateSessionStatusURL + JSON.stringify(data)
+      BASE_URL_LOAD_BOWL + updateSessionStatusURL + JSON.stringify(data)
     );
     return result;
   },
 
   getSessionBowlsLoaded: async (data: any) => {
     let result = await getSessionBowlsLoaded(
-      BASE_URL_BOWL_DETAILS + GetSessionBowlsLoaded + data
+      BASE_URL_LOAD_BOWL + GetSessionBowlsLoaded + data
     );
     return result;
   },
 
   getSessionDetail: async (data: any) => {
     let result = await getBowlDetails(
-      BASE_URL_BOWL_DETAILS + GetSessionDetail + data
+      BASE_URL_LOAD_BOWL + GetSessionDetail + data
     );
     return result;
   },
 
   getfeedingAnimalSessions: async (data: any) => {
     let result = await getfeedingAnimalSessions(
-      BASE_URL_BOWL_DETAILS + GetAnimalSessionDetail + data
+      BASE_URL_LOAD_BOWL + GetAnimalSessionDetail + data
     );
     return result;
   },
 
   setLoadBowlDetails: async (data: any) => {
     let result = await setLoadBowlDetails(
-      BASE_URL_BOWL_DETAILS + SetLoadBowlDetails + data
+      BASE_URL_LOAD_BOWL + SetLoadBowlDetails + data
     );
     return result;
   },
@@ -1711,13 +1661,11 @@ const NetworkManager = {
   },
 
   doGetUserInfo: async (userId: string) => {
-
     let result = await getUserInfo(BASE_URL + USERS_INFO, userId);
     return result;
   },
 
   getSpeciesList: async () => {
-
     let result = await getSpecies(BASE_URL + LOOKUP_SPECIES);
     return result;
   },
@@ -1770,7 +1718,7 @@ const NetworkManager = {
     flow: string
   ) => {
     let result = await getLocationsByName(
-      BASE_URL + LOOKUP_LOCATIONS_BY_NAME,
+      BASE_URL + LOOKUP_LOCATION,
       startIndex,
       limit,
       userinfoid,
@@ -1827,12 +1775,10 @@ const NetworkManager = {
 
   getDVCList: async () => {
     let dvcs: DVCListResponse[] = await getDVCs(BASE_URL + LOOKUP_DVC);
-    //console.log("getDVCList");
     return dvcs;
   },
   getLookUpUsers: async () => {
     let dvcs = await getLookUpUsers(BASE_URL + LOOKUP_USERS);
-    //console.log("--------getLookUpUsers-----------");
     return dvcs;
   },
 
@@ -1841,37 +1787,31 @@ const NetworkManager = {
     isOnline: boolean = true
   ) => {
     if (isOnline) {
-      console.log("requestBody=>", JSON.stringify(requestBody));
       let groupActResponse = await saveGroupActResults(
         BASE_URL + GET_ACT_RESULTS_SAVE,
         requestBody
       );
-      //console.log("REPSONS=>=>", groupActResponse);
       return groupActResponse;
     } else {
       let result = await Utils.saveOfflineACTRecord(
         BASE_URL + GET_ACT_RESULTS_SAVE,
         requestBody
       );
-      //console.log("SAVE ", result);
     }
   },
 
   getAuditEntityTypes: async () => {
     let result = await getAuditEntityTypes(BASE_URL + AUDIT_ENTITY_TYPES);
-    //console.log(result);
     return result;
   },
 
   getAuditEntity: async () => {
     let result = await getAuditEntity(BASE_URL + AUDIT_ENTITY);
-    console.log(result);
     return result;
   },
 
   // getLookUpUsers: async () => {
   //   let result = await getLookUpUsers(BASE_URL + LOOKUP_USERS);
-  //   console.log(result);
   //   return result;
   // },
   getAuditDetailsList: async (

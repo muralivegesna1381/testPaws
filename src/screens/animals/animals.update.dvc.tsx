@@ -69,7 +69,6 @@ const AnimalUpdateDvcScreen = (props: AnimalScreenProps) => {
                             {
                                 text: "OK",
                                 onPress: () => {
-                                    // console.log("OK Pressed");
                                     navigation.pop()
                                 },
                             },
